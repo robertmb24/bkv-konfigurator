@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>bKV Konfigurator | MB24</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap');
+:root{--brand:#7447d7;--brand-dark:#5532a8;--brand-light:#ede8fb;--brand-xlight:#f5f2fd;--ink:#1C1C1A;--ink-mid:#4A4A47;--ink-muted:#8A8A86;--surface:#ffffff;--border:#E3E3DF;--radius:16px;--radius-sm:10px;--font:'Poppins',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+.bkv-wizard{font-family:var(--font);background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:36px 40px;width:100%;max-width:960px;margin:0 auto;box-shadow:0 4px 32px rgba(116,71,215,.08)}
+.wiz-progress{display:flex;align-items:center;gap:8px;margin-bottom:32px}
+.wiz-step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;background:var(--border);color:var(--ink-muted);transition:all .3s;flex-shrink:0}
+.wiz-step-dot.active{background:var(--brand);color:#fff;box-shadow:0 0 0 4px var(--brand-light)}
+.wiz-step-dot.done{background:var(--brand);color:#fff}
+.wiz-step-dot.done::after{content:'✓';font-size:12px}
+.wiz-step-dot.done span{display:none}
+.wiz-connector{flex:1;height:2px;background:var(--border);border-radius:1px;overflow:hidden}
+.wiz-connector-fill{height:100%;background:var(--brand);width:0%;transition:width .4s ease}
+.wiz-screen{display:none}
+.wiz-screen.active{display:block}
+.wiz-eyebrow{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--brand);margin-bottom:8px}
+.wiz-title{font-size:22px;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:6px;letter-spacing:-.01em}
+.wiz-sub{font-size:14px;font-weight:300;color:var(--ink-muted);margin-bottom:24px;line-height:1.6}
+.wiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.wiz-option{border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:13px 15px;cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:10px;background:var(--surface);text-align:left;font-family:var(--font)}
+.wiz-option:hover{border-color:var(--brand);background:var(--brand-xlight)}
+.wiz-option.selected{border-color:var(--brand);background:var(--brand-light)}
+.wiz-option-icon{width:34px;height:34px;background:var(--brand-xlight);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.wiz-option.selected .wiz-option-icon{background:var(--brand-light)}
+.wiz-option-label{font-size:13.5px;font-weight:500;color:var(--ink);line-height:1.3}
+.wiz-option-sub{font-size:12px;font-weight:300;color:var(--ink-muted);margin-top:2px}
+.wiz-check{width:20px;height:20px;border:1.5px solid var(--border);border-radius:5px;flex-shrink:0;margin-left:auto;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.wiz-option.selected .wiz-check{background:var(--brand);border-color:var(--brand)}
+.wiz-option.selected .wiz-check::after{content:'';width:10px;height:6px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px);display:block}
+.wiz-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:24px}
+.wiz-btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-size:14px;font-weight:500;border:none;border-radius:100px;cursor:pointer;transition:all .2s;padding:12px 22px}
+.wiz-btn-primary{background:var(--brand);color:#fff}
+.wiz-btn-primary:hover{background:var(--brand-dark);transform:scale(1.02)}
+.wiz-btn-ghost{background:none;border:1px solid var(--border);color:var(--ink-muted)}
+.wiz-btn-ghost:hover{background:var(--border)}
+.wiz-rec{background:var(--brand-xlight);border:1.5px solid var(--brand-light);border-radius:var(--radius-sm);padding:18px 22px;margin-bottom:16px}
+.wiz-rec-label{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--brand);margin-bottom:8px}
+.wiz-rec-title{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.wiz-rec-text{font-size:13px;font-weight:300;color:var(--ink-mid);line-height:1.65}
+.wiz-rec-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.wiz-pill{font-size:12px;font-weight:500;color:var(--brand-dark);background:var(--brand-light);padding:4px 12px;border-radius:100px}
+@media(max-width:768px){.bkv-wizard{padding:28px 24px}}
+@media(max-width:600px){.bkv-wizard{padding:20px 16px;border-radius:12px}.wiz-options{grid-template-columns:1fr}.wiz-title{font-size:18px}.wiz-nav{flex-direction:column-reverse}.wiz-nav .wiz-btn{width:100%;justify-content:center}}
+/* === Erweiterungen === */
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.l{font-size:12px;font-weight:600;color:var(--ink-mid);display:block}
+.lh{font-weight:400;color:var(--ink-muted)}
+input[type=text],input[type=number],input[type=date],input[type=month],select,textarea{font-family:var(--font);font-size:13.5px;padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;width:100%;color:var(--ink);outline:none;background:var(--surface);transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-light)}
+textarea{min-height:72px;resize:vertical}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:580px){.g2{grid-template-columns:1fr}}
+.hr{border:none;border-top:1.5px solid var(--border);margin:20px 0}
+.sl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-muted);margin-bottom:12px}
+input[type=range]{width:100%;height:6px;background:var(--border);border-radius:3px;appearance:none;-webkit-appearance:none;outline:none;border:none;padding:0;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--brand);border:2px solid #fff;box-shadow:0 2px 5px rgba(116,71,215,.3)}
+.sbig{font-size:28px;font-weight:700;color:var(--brand);line-height:1}
+.ssub{font-size:12.5px;color:var(--ink-muted);margin-top:3px}
+.stk{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-muted);margin-top:4px}
+.pcard{background:var(--brand-xlight);border:1.5px solid var(--border);border-radius:10px;padding:13px;margin-bottom:9px}
+.ptop{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.pico{width:32px;height:32px;background:var(--brand-light);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.pname{font-size:13px;font-weight:600;color:var(--ink)}
+.pdsc{font-size:11.5px;color:var(--ink-muted)}
+.pbrow{display:flex;gap:4px}
+.pb{flex:1;font-family:var(--font);font-size:10px;font-weight:600;border:1.5px solid var(--border);border-radius:6px;padding:6px 2px;cursor:pointer;background:#fff;color:var(--ink-muted);text-align:center;line-height:1.3;transition:all .12s}
+.pb:hover{border-color:var(--brand);color:var(--brand)}
+.pb.s0{background:var(--border);color:var(--ink-muted);border-color:var(--border)}
+.pb.s1{background:var(--brand-xlight);border-color:var(--brand-light);color:var(--brand-dark)}
+.pb.s2{background:var(--brand-light);border-color:var(--brand-light);color:var(--brand-dark)}
+.pb.s3{background:var(--brand);border-color:var(--brand);color:#fff}
+.pb.s4{background:var(--brand-dark);border-color:var(--brand-dark);color:#fff}
+.meter{background:var(--brand-xlight);border:1.5px solid var(--border);border-radius:10px;padding:15px;margin-top:14px}
+.mtrk{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin:8px 0 6px}
+.mfll{height:100%;border-radius:4px;transition:width .3s,background .3s}
+.bm{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;background:var(--brand-xlight);border-radius:10px;padding:14px;margin:12px 0}
+.bmv{font-size:16px;font-weight:700;color:var(--brand)}
+.bml{font-size:10px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
+.ib{padding:11px 13px;border-radius:8px;font-size:12.5px;line-height:1.55;display:flex;gap:9px;margin-top:10px}
+.ib.g{background:#dcfce7;color:#14532d}
+.ib.a{background:#fef3c7;color:#78350f}
+.ib.r{background:#fee2e2;color:#7f1d1d}
+.ib.b{background:var(--brand-xlight);color:var(--brand-dark)}
+.dots{display:flex;gap:3px;align-items:center}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--border)}
+.dot.on{background:var(--brand)}
+.dot.hi{background:var(--brand-dark)}
+.crow{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);font-size:12.5px}
+.crow:last-child{border:none}
+.cbdg{width:30px;height:30px;border-radius:7px;font-size:9px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rnk{width:24px;height:24px;border-radius:50%;background:var(--border);color:var(--ink-muted);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.schi{padding:3px 8px;border-radius:5px;font-size:12.5px;font-weight:700}
+.shi{background:var(--brand-light);color:var(--brand-dark)}
+.smd{background:var(--brand-xlight);color:var(--brand-dark)}
+.slo{background:var(--border);color:var(--ink-muted)}
+.kh{display:none!important}
+@media print{.wiz-nav,.wiz-progress{display:none!important}}
+</style>
+</head>
+<body>
+<div class="bkv-wizard">
+
+<div class="wiz-progress">
+  <div class="wiz-step-dot active" id="d1"><span>1</span></div>
+  <div class="wiz-connector"><div class="wiz-connector-fill" id="c1"></div></div>
+  <div class="wiz-step-dot" id="d2"><span>2</span></div>
+  <div class="wiz-connector"><div class="wiz-connector-fill" id="c2"></div></div>
+  <div class="wiz-step-dot" id="d3"><span>3</span></div>
+  <div class="wiz-connector"><div class="wiz-connector-fill" id="c3"></div></div>
+  <div class="wiz-step-dot" id="d4"><span>4</span></div>
+  <div class="wiz-connector"><div class="wiz-connector-fill" id="c4"></div></div>
+  <div class="wiz-step-dot" id="d5"><span>5</span></div>
+  <div class="wiz-connector"><div class="wiz-connector-fill" id="c5"></div></div>
+  <div class="wiz-step-dot" id="d6"><span>6</span></div>
+  <div class="wiz-connector"><div class="wiz-connector-fill" id="c6"></div></div>
+  <div class="wiz-step-dot" id="d7"><span>7</span></div>
+</div>
+
+<!-- S1 Kundendaten -->
+<div class="wiz-screen active" id="s1">
+  <p class="wiz-eyebrow">Schritt 1 · Kundendaten</p>
+  <h2 class="wiz-title">Wer sitzt euch gegenüber?</h2>
+  <p class="wiz-sub">Basisinfos zum Unternehmen und Entscheidungsträger.</p>
+  <div class="g2">
+    <div class="field"><label class="l">Firmenname</label><input type="text" id="fn" placeholder="Muster GmbH"></div>
+    <div class="field"><label class="l">Branche</label><select id="br"><option value="">– wählen –</option><option>Produktion / Industrie</option><option>IT / Technologie</option><option>Handel / Retail</option><option>Handwerk / Bau</option><option>Gesundheit / Pflege</option><option>Finanz / Versicherung</option><option>Beratung / Consulting</option><option>Transport / Logistik</option><option>Sonstige</option></select></div>
+    <div class="field"><label class="l">Ansprechpartner</label><input type="text" id="asp" placeholder="Vor- und Nachname"></div>
+    <div class="field"><label class="l">Position / Funktion</label><input type="text" id="pos" placeholder="HR-Leitung, Geschäftsführer …"></div>
+  </div>
+  <hr class="hr">
+  <p class="sl">Entscheidungsträger</p>
+  <div class="wiz-options">
+    <button class="wiz-option" onclick="pick(this,'ent','HR')"><div class="wiz-option-icon">👤</div><div class="wiz-option-label">HR-Leitung</div><div class="wiz-check"></div></button>
+    <button class="wiz-option selected" onclick="pick(this,'ent','GF+HR')"><div class="wiz-option-icon">🤝</div><div class="wiz-option-label">HR + GF gemeinsam</div><div class="wiz-check"></div></button>
+    <button class="wiz-option" onclick="pick(this,'ent','GF')"><div class="wiz-option-icon">🏢</div><div class="wiz-option-label">Geschäftsführung</div><div class="wiz-check"></div></button>
+    <button class="wiz-option" onclick="pick(this,'ent','unklar')"><div class="wiz-option-icon">❓</div><div class="wiz-option-label">Noch unklar</div><div class="wiz-check"></div></button>
+  </div>
+  <div class="field"><label class="l">Gesprächsdatum</label><input type="date" id="gdat"></div>
+  <div class="wiz-nav"><div></div><button class="wiz-btn wiz-btn-primary" onclick="next()">Weiter →</button></div>
+</div>
+
+<!-- S2 Mitarbeiter -->
+<div class="wiz-screen" id="s2">
+  <p class="wiz-eyebrow">Schritt 2 · Mitarbeiterstruktur</p>
+  <h2 class="wiz-title">Wie groß ist die Belegschaft?</h2>
+  <p class="wiz-sub">Mitarbeiterzahl, GKV-Quote und Demografik – relevant für Anbieterfilter und Scoring.</p>
+  <div class="g2">
+    <div class="field"><label class="l">Mitarbeiter gesamt</label><input type="number" id="mag" min="1" placeholder="z. B. 80"></div>
+    <div class="field"><label class="l">Davon versicherbar <span class="lh">(ohne PKV / GF)</span></label><input type="number" id="mav" min="1" placeholder="z. B. 65"></div>
+  </div>
+  <hr class="hr">
+  <p class="sl">GKV-Anteil der Belegschaft</p>
+  <div class="field">
+    <label class="l">GKV-Quote: <strong id="gkvlbl">80 %</strong></label>
+    <input type="range" id="gkvsl" min="0" max="100" value="80" step="5" oninput="updGKV(this.value)" style="margin-top:8px">
+    <div class="stk"><span>0 %</span><span>50 %</span><span>100 %</span></div>
+  </div>
+  <div class="ib b" id="gkvinfo"><span>ℹ️</span><span>GKV-Anteil 80 % · PKV-Anteil 20 %. Budgettarife ideal für hohe GKV-Quoten.</span></div>
+  <hr class="hr">
+  <div class="g2">
+    <div class="field"><label class="l">Altersstruktur</label><select id="alts"><option value="gemischt">Gemischt (Ø 33–48)</option><option value="jung">Überwiegend jung (Ø &lt; 33)</option><option value="erfahren">Überwiegend erfahren (Ø &gt; 48)</option></select></div>
+    <div class="field"><label class="l">Berufsgruppe</label><select id="beruf"><option value="">– wählen –</option><option value="buero">Büro / Homeoffice</option><option value="handwerk">Handwerk / Produktion</option><option value="gemischt">Gemischt</option><option value="pflege">Pflege / Gesundheit</option></select></div>
+  </div>
+  <div class="wiz-nav"><button class="wiz-btn wiz-btn-ghost" onclick="prev()">← Zurück</button><button class="wiz-btn wiz-btn-primary" onclick="next()">Weiter →</button></div>
+</div>
+
+<!-- S3 Benefits / Sachbezug -->
+<div class="wiz-screen" id="s3">
+  <p class="wiz-eyebrow">Schritt 3 · Bestehende Benefits</p>
+  <h2 class="wiz-title">Welche Sachbezüge gibt es bereits?</h2>
+  <p class="wiz-sub">Alle Sachbezüge summieren sich zur 50-€-Freigrenze (§ 8 Abs. 2 EStG). Überschreitung = voller Betrag steuerpflichtig.</p>
+  <div class="g2">
+    <div class="field"><label class="l">Tankgutschein / Mobilitätskarte</label><input type="number" id="sb1" min="0" max="50" step="0.5" placeholder="€ / Monat" oninput="updSB()"></div>
+    <div class="field"><label class="l">Benefit Card / Shopping-Gutschein</label><input type="number" id="sb2" min="0" max="50" step="0.5" placeholder="€ / Monat" oninput="updSB()"></div>
+    <div class="field"><label class="l">Essenszuschuss</label><input type="number" id="sb3" min="0" max="50" step="0.5" placeholder="€ / Monat" oninput="updSB()"></div>
+    <div class="field"><label class="l">Weitere Sachbezüge</label><input type="number" id="sb4" min="0" max="50" step="0.5" placeholder="€ / Monat" oninput="updSB()"></div>
+  </div>
+  <div class="meter">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:13px;font-weight:600;color:var(--ink-mid)">💡 Sachbezugs-Spielraum</span>
+      <span style="font-size:18px;font-weight:700" id="sbrem">50,00 €</span>
+    </div>
+    <div class="mtrk"><div class="mfll" id="sbfil" style="width:0%;background:#16a34a"></div></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--ink-muted)">
+      <span id="sbused">Genutzt: 0,00 € / 50,00 €</span>
+      <span id="sbstat" style="padding:3px 9px;border-radius:5px;background:#dcfce7;color:#14532d;font-weight:600;font-size:11.5px">✅ Spielraum vorhanden</span>
+    </div>
+  </div>
+  <div id="sbwarn" class="kh"><div class="ib a" style="margin-top:12px"><span>⚠️</span><div>Freigrenze ausgeschöpft. Für die bKV ist eine der Pauschalbesteuerungsoptionen nötig – wird in Schritt 4 präzisiert.</div></div></div>
+  <div class="wiz-nav"><button class="wiz-btn wiz-btn-ghost" onclick="prev()">← Zurück</button><button class="wiz-btn wiz-btn-primary" onclick="next()">Weiter →</button></div>
+</div>
+
+<!-- S4 Budget & Modell -->
+<div class="wiz-screen" id="s4">
+  <p class="wiz-eyebrow">Schritt 4 · Budget & Modell</p>
+  <h2 class="wiz-title">Wie viel Budget und welches Modell?</h2>
+  <p class="wiz-sub">Jahresbudget pro Mitarbeiter, Tarifmodell und Steuerampel auf Basis Schritt 3.</p>
+  <p class="sl">Tarifmodell</p>
+  <div class="wiz-options">
+    <button class="wiz-option selected" onclick="pick(this,'modell','budget')"><div class="wiz-option-icon">🪙</div><div><div class="wiz-option-label">Budgettarif</div><div class="wiz-option-sub">Fester €-Topf / Jahr</div></div><div class="wiz-check"></div></button>
+    <button class="wiz-option" onclick="pick(this,'modell','erstattung')"><div class="wiz-option-icon">📄</div><div><div class="wiz-option-label">Erstattungstarif</div><div class="wiz-option-sub">Kostenerstattung je Leistung</div></div><div class="wiz-check"></div></button>
+    <button class="wiz-option" onclick="pick(this,'modell','gruppe')"><div class="wiz-option-icon">👥</div><div><div class="wiz-option-label">Gruppenvertrag</div><div class="wiz-option-sub">Kollektiv-/Firmentarif</div></div><div class="wiz-check"></div></button>
+    <button class="wiz-option" onclick="pick(this,'modell','kombination')"><div class="wiz-option-icon">🔀</div><div><div class="wiz-option-label">Kombination</div><div class="wiz-option-sub">Mehrere Modelle parallel</div></div><div class="wiz-check"></div></button>
+  </div>
+  <hr class="hr">
+  <p class="sl">Jahresbudget pro Mitarbeiter</p>
+  <div class="field">
+    <div><span class="sbig" id="budval">600</span> <span style="font-size:14px;color:var(--ink-muted);font-weight:500">€ / Jahr</span></div>
+    <div class="ssub" id="budsub">≈ 50,00 € / Monat</div>
+    <input type="range" id="budsl" min="300" max="1500" value="600" step="50" oninput="updBud(this.value)" style="margin-top:10px">
+    <div class="stk"><span>300 €</span><span>600 €</span><span>900 €</span><span>1.200 €</span><span>1.500 €</span></div>
+  </div>
+  <div class="bm">
+    <div><div class="bmv" id="bmmon">36 €</div><div class="bml">Monatsbeitrag AG ca.</div></div>
+    <div><div class="bmv" id="bmtot">–</div><div class="bml">Jahreskosten gesamt</div></div>
+    <div><div class="bmv" id="bmmav">–</div><div class="bml">Versicherte MA</div></div>
+  </div>
+  <div id="taxstat"></div>
+  <hr class="hr">
+  <div class="g2">
+    <div class="field"><label class="l">Wunsch-Starttermin</label><input type="month" id="start"></div>
+    <div class="field"><label class="l">Vertragsrunde</label><select id="vrunde"><option value="neu">Neuabschluss</option><option value="wechsel">Anbieterwechsel</option><option value="erweiterung">Erweiterung bestehend</option></select></div>
+  </div>
+  <div class="wiz-nav"><button class="wiz-btn wiz-btn-ghost" onclick="prev()">← Zurück</button><button class="wiz-btn wiz-btn-primary" onclick="next()">Weiter →</button></div>
+</div>
+
+<!-- S5 Leistungen -->
+<div class="wiz-screen" id="s5">
+  <p class="wiz-eyebrow">Schritt 5 · Leistungspriorisierung</p>
+  <h2 class="wiz-title">Was ist der Belegschaft wichtig?</h2>
+  <p class="wiz-sub">Priorisierung fließt direkt ins Scoring. <strong>Muss-Leistungen</strong> werden 5-fach gewichtet.</p>
+  <div id="priogrid"></div>
+  <div class="wiz-nav"><button class="wiz-btn wiz-btn-ghost" onclick="prev()">← Zurück</button><button class="wiz-btn wiz-btn-primary" onclick="next()">Weiter →</button></div>
+</div>
+
+<!-- S6 Sonstiges -->
+<div class="wiz-screen" id="s6">
+  <p class="wiz-eyebrow">Schritt 6 · Sonstige Informationen</p>
+  <h2 class="wiz-title">Wettbewerb, Rollout & Notizen</h2>
+  <p class="wiz-sub">Liegt bereits ein Angebot vor? Wie soll die Einführung aussehen?</p>
+  <p class="sl">Bestehendes bKV-Angebot</p>
+  <div class="wiz-options">
+    <button class="wiz-option selected" onclick="pick(this,'vorh','nein');toggleEx(false)"><div class="wiz-option-icon">🚫</div><div class="wiz-option-label">Kein Angebot vorhanden</div><div class="wiz-check"></div></button>
+    <button class="wiz-option" onclick="pick(this,'vorh','ja');toggleEx(true)"><div class="wiz-option-icon">📋</div><div class="wiz-option-label">Angebot liegt vor</div><div class="wiz-check"></div></button>
+  </div>
+  <div id="exdet" class="kh" style="margin-bottom:14px">
+    <div class="g2">
+      <div class="field"><label class="l">Anbieter</label><input type="text" id="exanb" placeholder="z. B. Allianz"></div>
+      <div class="field"><label class="l">Tarif / Modell</label><input type="text" id="extar" placeholder="z. B. MeineGesundheit 600"></div>
+    </div>
+    <div class="field"><label class="l">Monatsbeitrag / MA</label><input type="number" id="exbei" placeholder="€ / Monat"></div>
+  </div>
+  <hr class="hr">
+  <div class="g2">
+    <div class="field"><label class="l">Kommunikationsweg</label><select id="komm"><option value="digital">📱 Digital (E-Mail, App)</option><option value="analog">📬 Analog (Brief, Broschüre)</option><option value="beides">🔄 Beides</option></select></div>
+    <div class="field"><label class="l">HR-Kontakt Implementierung</label><input type="text" id="hrk" placeholder="Name / E-Mail"></div>
+  </div>
+  <div class="field"><label class="l">Interne Notizen / Besonderheiten</label><textarea id="noti" placeholder="Besondere Anforderungen, Zeitdruck, politische Aspekte …"></textarea></div>
+  <div class="wiz-nav"><button class="wiz-btn wiz-btn-ghost" onclick="prev()">← Zurück</button><button class="wiz-btn wiz-btn-primary" style="background:var(--brand-dark)" onclick="next()">🔍 Auswertung starten</button></div>
+</div>
+
+<!-- S7 Ergebnis -->
+<div class="wiz-screen" id="s7">
+  <p class="wiz-eyebrow">Schritt 7 · Auswertung</p>
+  <div id="s7c"></div>
+  <div class="wiz-nav" style="margin-top:20px">
+    <button class="wiz-btn wiz-btn-ghost" onclick="prev()">← Zurück</button>
+    <button class="wiz-btn wiz-btn-primary" onclick="window.print()">🖨️ Drucken</button>
+  </div>
+</div>
+
+</div>
+<script>
+const PW=[0,1,2,3,5];
+const PROV=[
+ {id:'allianz',n:'Allianz',a:'ALZ',c:'#003781',mA:5,mB:1500,mo:['budget','erstattung','gruppe','kombination'],s:{z:4,b:4,v:4,h:3,k:4,au:3,p:3},st:4,fl:3,tag:'Allrounder',tC:'#003781',tBg:'#EFF6FF',hl:'Allrounder · Extratöpfe Zahn & Brille · Beitragsgarantie 2026 · Budget-Übertrag möglich',w:null},
+ {id:'axa',n:'AXA',a:'AXA',c:'#00008F',mA:5,mB:1200,mo:['budget','erstattung','gruppe','kombination'],s:{z:3,b:3,v:4,h:3,k:4,au:4,p:5},st:4,fl:3,tag:'Mental Health',tC:'#5B21B6',tBg:'#EDE9FE',hl:'Stärkstes Angebot für Psychotherapie & Zweitmeinung · Beitragsgarantie bis 01.01.2027',w:null},
+ {id:'barmenia',n:'Barmenia',a:'BAR',c:'#009FE3',mA:5,mB:1200,mo:['budget','erstattung','gruppe'],s:{z:4,b:3,v:3,h:5,k:3,au:3,p:3},st:3,fl:3,tag:'Heilpraktiker',tC:'#065F46',tBg:'#D1FAE5',hl:'Stärkstes Heilpraktiker-Portfolio am Markt',w:'Beitragsanpassungen 2026 für einige Tarife angekündigt – vor Abschluss prüfen.'},
+ {id:'gothaer',n:'Gothaer',a:'GOT',c:'#C0392B',mA:5,mB:1200,mo:['budget','gruppe'],s:{z:3,b:3,v:4,h:3,k:4,au:3,p:3},st:1,fl:2,tag:'⚠️ Nicht empfohlen',tC:'#991B1B',tBg:'#FEE2E2',hl:'Günstige Tarife – Beitragserhöhung +50 % zum 01.01.2026',w:'Beitragserhöhung +50 % zum 01.01.2026 (Tarife nicht kostendeckend kalkuliert). Neuabschlüsse nicht empfohlen.'},
+ {id:'hallesche',n:'Hallesche',a:'HAL',c:'#1D5F9C',mA:10,mB:1500,mo:['budget','erstattung','gruppe'],s:{z:5,b:5,v:5,h:5,k:5,au:4,p:4},st:5,fl:4,tag:'🏆 Testsieger',tC:'#92400E',tBg:'#FEF3C7',hl:'7 Jahre beitragsstabil · Testsieger VersJournal · Budget wächst bei Vollausschöpfung',w:'100 % Teilnahmequote aller MA der Bezugsgruppe erforderlich (obligatorisches Modell).'},
+ {id:'signal',n:'Signal Iduna',a:'SIG',c:'#C89E00',mA:3,mB:1200,mo:['budget','erstattung','gruppe'],s:{z:3,b:3,v:4,h:3,k:3,au:3,p:3},st:3,fl:3,tag:'Ab 3 MA',tC:'#92400E',tBg:'#FEF9C3',hl:'Einziger Anbieter ab 3 Mitarbeitern · Ideal für Kleinstbetriebe',w:null},
+ {id:'dkv',n:'DKV',a:'DKV',c:'#005487',mA:5,mB:1200,mo:['budget','erstattung','gruppe'],s:{z:3,b:3,v:5,h:3,k:5,au:5,p:4},st:4,fl:3,tag:'KH & Ausland',tC:'#0C4A6E',tBg:'#E0F2FE',hl:'Stark bei Vorsorge, Krankenhaus & Auslandskrankenschutz · IVFP-Exzellenznote 2024',w:null},
+ {id:'hm',n:'HanseMerkur',a:'HM',c:'#1E3A5F',mA:5,mB:1700,mo:['budget','erstattung','gruppe'],s:{z:4,b:5,v:5,h:4,k:5,au:5,p:3},st:4,fl:5,tag:'Max. Flex.',tC:'#1E3A5F',tBg:'#EFF6FF',hl:'Höchstes Budget bis 1.700 € · 50-€-Schritte · Krankenhaustagegeld inkl. · Focus Money: Hervorragend',w:null}
+];
+const LEIST=[
+ {id:'z',icon:'🦷',n:'Zahnarzt & Zahnersatz',d:'Füllungen, Zahnersatz, Prophylaxe'},
+ {id:'b',icon:'👁️',n:'Brille & Sehhilfen',d:'Brillen, Kontaktlinsen, Laser-OP'},
+ {id:'v',icon:'🔬',n:'Vorsorge & Check-ups',d:'Krebsscreening, Untersuchungen'},
+ {id:'h',icon:'🌿',n:'Heilpraktiker',d:'Alternative Medizin, Osteopathie'},
+ {id:'k',icon:'🏥',n:'Krankenhaus',d:'Chefarzt, Einbettzimmer'},
+ {id:'au',icon:'✈️',n:'Auslandskrankenschutz',d:'Weltweiter Schutz, Rückholung'},
+ {id:'p',icon:'🧠',n:'Psychotherapie',d:'Psycholog. Beratung, Coaching'}
+];
+let cur=1;
+const S={fn:'',br:'',asp:'',pos:'',ent:'GF+HR',gdat:'',maG:0,maV:0,gkv:80,alts:'gemischt',beruf:'',sb:0,modell:'budget',budget:600,start:'',vrunde:'neu',prio:{z:2,b:2,v:2,h:1,k:1,au:1,p:1},vorh:'nein',exAnb:'',exTar:'',exBei:'',komm:'digital',hrk:'',noti:''};
+function showStep(n){
+  for(let i=1;i<=7;i++){
+    document.getElementById('s'+i).classList.toggle('active',i===n);
+    const d=document.getElementById('d'+i);
+    d.className='wiz-step-dot'+(i<n?' done':i===n?' active':'');
+    if(i<7)document.getElementById('c'+i).style.width=i<n?'100%':'0%';
+  }
+  cur=n;window.scrollTo({top:0,behavior:'smooth'});
+  if(n===7)renderRes();
+}
+function save(){
+  const g=id=>{const e=document.getElementById(id);return e?e.value:''};
+  if(cur===1){S.fn=g('fn');S.br=g('br');S.asp=g('asp');S.pos=g('pos');S.gdat=g('gdat')}
+  if(cur===2){S.maG=+g('mag')||0;S.maV=+g('mav')||0;S.gkv=+g('gkvsl')||80;S.alts=g('alts');S.beruf=g('beruf')}
+  if(cur===3){S.sb=(+g('sb1')||0)+(+g('sb2')||0)+(+g('sb3')||0)+(+g('sb4')||0)}
+  if(cur===4){S.budget=+g('budsl')||600;S.start=g('start');S.vrunde=g('vrunde')}
+  if(cur===6){S.exAnb=g('exanb');S.exTar=g('extar');S.exBei=g('exbei');S.komm=g('komm');S.hrk=g('hrk');S.noti=g('noti')}
+}
+function next(){save();showStep(Math.min(cur+1,7))}
+function prev(){save();showStep(Math.max(cur-1,1))}
+function pick(el,key,val){
+  el.parentElement.querySelectorAll('.wiz-option').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');S[key]=val;
+}
+function toggleEx(show){document.getElementById('exdet').classList.toggle('kh',!show)}
+function updGKV(v){
+  document.getElementById('gkvlbl').textContent=v+' %';
+  document.getElementById('gkvinfo').querySelector('span:last-child').textContent=
+    'GKV-Anteil '+v+' % · PKV-Anteil '+(100-v)+' %. '+(v>=80?'Budgettarif optimal.':v>=50?'Gemischt – Opt-in empfohlen.':'Hoher PKV-Anteil – Erstattungstarif prüfen.');
+  S.gkv=+v;
+}
+function updSB(){
+  const g=id=>+(document.getElementById(id)?.value)||0;
+  const used=g('sb1')+g('sb2')+g('sb3')+g('sb4');S.sb=used;
+  const rem=Math.max(0,50-used),pct=Math.min(100,(used/50)*100);
+  const col=used<=25?'#16a34a':used<=45?'#f59e0b':'#dc2626';
+  document.getElementById('sbfil').style.cssText='width:'+pct+'%;background:'+col;
+  document.getElementById('sbrem').style.color=col;
+  document.getElementById('sbrem').textContent=eu(rem)+' €';
+  document.getElementById('sbused').textContent='Genutzt: '+eu(used)+' € / 50,00 €';
+  const st=document.getElementById('sbstat');
+  if(used<=0){st.textContent='✅ Kein Sachbezug';st.style.cssText='padding:3px 9px;border-radius:5px;background:#dcfce7;color:#14532d;font-weight:600;font-size:11.5px'}
+  else if(used<50){const ok=rem>=10;st.textContent=ok?'✅ Spielraum vorhanden':'⚠️ Spielraum knapp';st.style.cssText='padding:3px 9px;border-radius:5px;background:'+(ok?'#dcfce7':'#fef3c7')+';color:'+(ok?'#14532d':'#78350f')+';font-weight:600;font-size:11.5px'}
+  else{st.textContent='🔴 Freigrenze voll';st.style.cssText='padding:3px 9px;border-radius:5px;background:#fee2e2;color:#7f1d1d;font-weight:600;font-size:11.5px'}
+  document.getElementById('sbwarn').classList.toggle('kh',used<50);
+}
+function updBud(v){
+  v=+v;S.budget=v;
+  document.getElementById('budval').textContent=v.toLocaleString('de-DE');
+  document.getElementById('budsub').textContent='≈ '+eu(v/12)+' € / Monat';
+  document.getElementById('bmmon').textContent='≈ '+eu(v*0.06)+' €';
+  document.getElementById('bmtot').textContent=S.maV?(eu(v*S.maV)+' €'):'–';
+  document.getElementById('bmmav').textContent=S.maV?(S.maV+' MA'):'–';
+  renderTax(v);
+}
+function renderTax(bud){
+  const mon=bud*0.06,tot=mon+S.sb;
+  const ma20=S.maV>=20,ok1=bud<=1000;
+  let h='';
+  if(tot<=50)h='<div class="ib g"><span>✅</span><div><strong>Sachbezug steuerfrei</strong> · Monatsbeitrag ca. '+eu(mon)+' € + Sachbezüge '+eu(S.sb)+' € = '+eu(tot)+' € ≤ 50-€-Grenze. Kein Versteuerungsaufwand.</div></div>';
+  else{
+    h='<div class="ib a"><span>⚠️</span><div><strong>Pauschalbesteuerung nötig</strong> · '+eu(mon)+' € (bKV) + '+eu(S.sb)+' € = '+eu(tot)+' € &gt; 50 €.</div></div><div style="margin-top:8px;display:grid;gap:7px">';
+    if(ma20&&ok1)h+='<div class="ib b"><span>📋</span><div><strong>§ 40 EStG (empfohlen)</strong> – Pauschale ~15–25 % LSt, SV-frei. Voraussetzung: ≥ 20 MA, Jahreszahlung, max. 1.000 €/MA/Jahr, Genehmigung Betriebsstättenfinanzamt.</div></div>';
+    h+='<div class="ib b"><span>📋</span><div><strong>§ 37b EStG</strong> – 30 % Pauschalsteuer zzgl. SolZ, SV-pflichtig. Einheitlich für alle Sachbezüge im Jahr.</div></div>';
+    if(!ma20)h+='<p style="font-size:11.5px;color:var(--ink-muted);padding:2px 4px">§ 40 EStG nicht verfügbar: mind. 20 MA erforderlich (aktuell '+(S.maV||'?')+').</p>';
+    h+='</div>';
+  }
+  document.getElementById('taxstat').innerHTML=h;
+}
+const PLBLS=['–','Nice','Wichtig','Sehr wichtig','Muss ★'];
+function renderPrio(){
+  document.getElementById('priogrid').innerHTML=LEIST.map(l=>`
+  <div class="pcard"><div class="ptop"><div class="pico">${l.icon}</div><div><div class="pname">${l.n}</div><div class="pdsc">${l.d}</div></div></div>
+  <div class="pbrow">${PLBLS.map((lbl,i)=>`<button class="pb${S.prio[l.id]===i?' s'+i:''}" onclick="setPrio('${l.id}',${i})">${lbl}</button>`).join('')}</div></div>`).join('');
+}
+function setPrio(id,v){S.prio[id]=v;renderPrio()}
+function scoreProv(p){
+  if(S.maV<p.mA)return{score:0,eligible:false,reason:'Mind. '+p.mA+' MA ('+S.maV+' verfügbar)'};
+  if(S.budget>p.mB)return{score:0,eligible:false,reason:'Max. Budget '+p.mB+' € überschritten'};
+  if(!p.mo.includes(S.modell)&&S.modell!=='kombination')return{score:0,eligible:false,reason:'Modell "'+S.modell+'" nicht verfügbar'};
+  let sc=0,mx=0;
+  for(const l of LEIST){const w=PW[S.prio[l.id]||0];sc+=w*p.s[l.id];mx+=w*5}
+  const sw=PW[2];sc+=sw*p.st;mx+=sw*5;
+  if(S.budget%300!==0||S.budget>1200){const fw=PW[1];sc+=fw*p.fl;mx+=fw*5}
+  if(p.id==='gothaer')sc*=0.35;
+  return{score:Math.min(Math.round(mx>0?(sc/mx)*100:50),98),eligible:true,reason:null};
+}
+function renderRes(){
+  const res=PROV.map(p=>({...p,...scoreProv(p)})).sort((a,b)=>b.score-a.score);
+  const elig=res.filter(r=>r.eligible),inel=res.filter(r=>!r.eligible);
+  const sL=[...LEIST].sort((a,b)=>(S.prio[b.id]||0)-(S.prio[a.id]||0));
+  const fmtM=m=>{try{return new Date(m+'-01').toLocaleString('de-DE',{month:'long',year:'numeric'})}catch{return m}};
+  let h=`<div class="wiz-rec"><div class="wiz-rec-label">📊 Gesprächsnotiz</div>
+    <div class="wiz-rec-title">${esc(S.fn||'Unbekanntes Unternehmen')}</div>
+    <div class="wiz-rec-pills">
+      ${S.br?`<span class="wiz-pill">${esc(S.br)}</span>`:''}
+      <span class="wiz-pill">${S.maV||'?'} MA versicherbar</span>
+      <span class="wiz-pill">${S.budget.toLocaleString('de-DE')} € / MA / Jahr</span>
+      <span class="wiz-pill">${ucf(S.modell)}tarif</span>
+      ${S.start?`<span class="wiz-pill">Start: ${fmtM(S.start)}</span>`:''}
+      ${S.vorh==='ja'?`<span class="wiz-pill">Bestehendes Angebot: ${esc(S.exAnb||'vorhanden')}</span>`:''}
+    </div>
+    ${S.noti?`<div style="margin-top:10px;font-size:12.5px;color:var(--ink-mid);background:rgba(116,71,215,.06);border-radius:7px;padding:9px 11px"><strong>Notizen:</strong> ${esc(S.noti)}</div>`:''}
+  </div>`;
+  if(elig.length){
+    const w=elig[0];
+    h+=`<div style="border:2px solid var(--brand);border-radius:14px;overflow:hidden;margin-bottom:12px">
+      <div style="background:var(--brand);color:#fff;padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">★ EMPFEHLUNG #1 · ${w.score} % MATCH</div>
+      <div style="padding:18px 20px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+          <div class="cbdg" style="background:${w.c};width:42px;height:42px;border-radius:10px;font-size:12px">${w.a}</div>
+          <div style="flex:1"><div style="font-size:18px;font-weight:700;color:var(--ink)">${esc(w.n)}</div>
+          <span style="font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;background:${w.tBg};color:${w.tC}">${w.tag}</span></div>
+        </div>
+        <div style="font-size:13px;color:var(--ink-mid);line-height:1.55;margin-bottom:12px">${esc(w.hl)}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:${w.w?'10px':'0'}">
+          ${sL.map(l=>`<div style="display:flex;align-items:center;gap:5px"><span style="font-size:12px;color:var(--ink-muted)">${l.icon} ${l.n.split(' ')[0]}</span><div class="dots">${[1,2,3,4,5].map(i=>`<div class="dot${i<=w.s[l.id]?(S.prio[l.id]>=3?' hi':' on'):''}"></div>`).join('')}</div></div>`).join('')}
+        </div>
+        ${w.w?`<div class="ib a"><span>⚠️</span><span>${esc(w.w)}</span></div>`:''}
+      </div>
+    </div>`;
+    elig.slice(1,3).forEach((p,i)=>{
+      h+=`<div style="border:1.5px solid var(--border);border-radius:10px;padding:13px 15px;display:flex;gap:10px;margin-bottom:9px">
+        <div class="cbdg" style="background:${p.c}">${p.a}</div>
+        <div style="flex:1"><div style="font-size:13.5px;font-weight:700">${['🥈','🥉'][i]} ${esc(p.n)} <span class="schi shi">${p.score} %</span></div>
+        <div style="font-size:12px;color:var(--ink-muted);margin-top:3px;line-height:1.5">${esc(p.hl)}</div>
+        ${p.w?`<div class="ib a" style="margin-top:7px"><span>⚠️</span><span>${esc(p.w)}</span></div>`:''}</div>
+      </div>`;
+    });
+  }else h+='<div class="ib r"><span>❌</span><div><strong>Kein Anbieter qualifiziert.</strong> Bitte Mitarbeiterzahl und Budget prüfen.</div></div>';
+  h+=`<div style="background:var(--surface);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;margin-top:14px">
+    <div style="padding:10px 14px;border-bottom:1px solid var(--border);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-muted)">Vollständiger Anbietervgleich</div>
+    ${res.map((p,i)=>`<div class="crow" style="${!p.eligible?'opacity:.45':''}">
+      <div class="rnk">${p.eligible?i+1:'–'}</div>
+      <div class="cbdg" style="background:${p.c}">${p.a}</div>
+      <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12.5px">${esc(p.n)}</div>
+      <div style="font-size:11px;color:var(--ink-muted);margin-top:2px">${p.eligible?p.tag:esc(p.reason||'–')}</div></div>
+      <div style="text-align:right;flex-shrink:0"><span class="schi ${p.eligible?(p.score>=70?'shi':'smd'):'slo'}">${p.eligible?p.score+' %':'–'}</span>
+      <div class="dots" style="justify-content:flex-end;margin-top:4px">${[1,2,3,4,5].map(j=>`<div class="dot${j<=p.st?' on':''}"></div>`).join('')}<span style="font-size:10px;color:var(--ink-muted);margin-left:3px">Stab.</span></div></div>
+    </div>`).join('')}
+  </div>`;
+  if(inel.length)h+=`<div class="ib b" style="margin-top:10px"><span>ℹ️</span><div><strong>Nicht qualifiziert:</strong> ${inel.map(p=>`${p.n} (${esc(p.reason||'–')})`).join(' · ')}</div></div>`;
+  h+=`<div class="ib b" style="margin-top:8px"><span>📐</span><div><strong>Scoring:</strong> Prioritätsgewicht × Anbieterpunktzahl (Muss=5×, Sehr wichtig=3×, Wichtig=2×, Nice=1×) + Stabilitätsbonus. Gothaer: −65 % (Beitragserhöhung 2026). Relative Einschätzung – finale Entscheidung auf Basis aktueller Angebote.</div></div>`;
+  document.getElementById('s7c').innerHTML=h;
+}
+function eu(n){return (+n).toFixed(2).replace('.',',')}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function ucf(s){return s?s[0].toUpperCase()+s.slice(1):s}
+(function(){
+  document.getElementById('gdat').value=new Date().toISOString().slice(0,10);
+  const nm=new Date();nm.setMonth(nm.getMonth()+1);
+  document.getElementById('start').value=nm.toISOString().slice(0,7);
+  renderPrio();updBud(600);showStep(1);
+})();
+</script>
+</body>
+</html>
