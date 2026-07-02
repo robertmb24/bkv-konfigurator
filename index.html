@@ -849,6 +849,31 @@ function renderRes(){
   h+=`<div class="ib brand" style="margin-top:8px"><i data-lucide="sparkles" class="lu"></i><span>Die bKV entwickelt sich zum Standard-Benefit – seien Sie eines der ersten Unternehmen, die sie richtig einführen. Als Partner an Ihrer Seite sorgt MB24 dafür, dass Produkt, Einführung und Betreuung zusammenpassen.</span></div>`;
   document.getElementById('s7c').innerHTML=h;
   lucideRefresh();
+  sendToSheet(elig);
+}
+// Trägt sich selbst als "einmal pro Auswertung" ein, damit erneutes Rendern (z.B. durch
+// Zurück-/Vor-Navigation) nicht wiederholt Zeilen im Sheet anlegt.
+let lastSentSnapshot=null;
+const GSHEET_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbxxl4NDu8c6D_xSAvEz2bvKKD9JOPPmPVekizDTmjFUi22zna-g72Uq8VJnGJvOJIdA/exec';
+function sendToSheet(elig){
+  if(!GSHEET_WEBHOOK_URL)return;
+  const mainContact=S.contacts.find(c=>c.name||c.tel||c.email)||{};
+  const MODL={budget:'Budgettarif',erstattung:'Bausteintarif',kombination:'Kombi-Tarif'};
+  const payload={
+    firmenname:S.fn,branche:S.br,mitarbeiterVersicherbar:S.maV,jahresbudget:S.budget,
+    tarifmodell:MODL[S.modell]||S.modell,wunschStart:S.start,
+    hauptansprechpartnerName:mainContact.name||'',hauptansprechpartnerPosition:mainContact.position||'',
+    hauptansprechpartnerTel:mainContact.tel||'',hauptansprechpartnerEmail:mainContact.email||'',
+    empfehlung1Name:elig[0]?.n||'',empfehlung1Match:elig[0]?.score??'',
+    empfehlung2Name:elig[1]?.n||'',empfehlung2Match:elig[1]?.score??'',
+    empfehlung3Name:elig[2]?.n||'',empfehlung3Match:elig[2]?.score??'',
+    notizen:S.noti
+  };
+  const snapshot=JSON.stringify(payload);
+  if(snapshot===lastSentSnapshot)return;
+  lastSentSnapshot=snapshot;
+  fetch(GSHEET_WEBHOOK_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:snapshot})
+    .catch(()=>{lastSentSnapshot=null;});
 }
 function eu(n){return (+n).toFixed(2).replace('.',',')}
 function intEu(n){return Math.round(+n).toLocaleString('de-DE')}
