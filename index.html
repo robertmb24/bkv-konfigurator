@@ -10,8 +10,8 @@
 :root{--brand:#7447d7;--brand-dark:#5532a8;--brand-light:#ede8fb;--brand-xlight:#f5f2fd;--ink:#1C1C1A;--ink-mid:#4A4A47;--ink-muted:#8A8A86;--surface:#ffffff;--border:#E3E3DF;--radius:16px;--radius-sm:10px;--font:'Poppins',sans-serif}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{background:var(--surface);overflow:hidden;font-weight:300}
-.bkv-wizard{font-family:var(--font);font-weight:300;background:var(--surface);padding:36px 40px;width:100%;height:100vh;margin:0 auto;overflow-y:auto;-webkit-overflow-scrolling:touch}
+body{background:#EAE7FF;overflow:hidden;font-weight:300}
+.bkv-wizard{font-family:var(--font);font-weight:300;background:#EAE7FF;padding:36px 40px;width:100%;height:100vh;margin:0 auto;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .lu{width:16px;height:16px;stroke-width:2;flex-shrink:0;vertical-align:-3px}
 .wiz-header{display:flex;align-items:center;gap:10px;margin-bottom:20px}
 .wiz-header img{height:24px;width:auto}
@@ -236,7 +236,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   <div class="ib b" id="gkvinfo"><i data-lucide="info" class="lu"></i><span>Nur gesetzlich versicherte Mitarbeitende sind über eine bKV versicherbar. Privat Versicherte und Geschäftsführung werden separat betrachtet.</span></div>
   <hr class="hr">
   <div class="g2">
-    <div class="field"><label class="l">Altersstruktur</label><select id="alts"><option value="gemischt">Gemischt (Ø 33–48)</option><option value="jung">Überwiegend jung (Ø &lt; 33)</option><option value="erfahren">Überwiegend erfahren (Ø &gt; 48)</option></select></div>
+    <div class="field"><label class="l">Durchschnittsalter Ihrer Belegschaft</label><select id="alts"><option value="gemischt">Gemischt (Ø 33–48)</option><option value="jung">Überwiegend jung (Ø &lt; 33)</option><option value="erfahren">Überwiegend erfahren (Ø &gt; 48)</option></select></div>
     <div class="field"><label class="l">Berufsgruppe / Tätigkeitsschwerpunkt</label><select id="beruf">
       <option value="">– wählen –</option>
       <option value="buero">Büro & Verwaltung</option>
@@ -291,11 +291,18 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <button class="wiz-option" style="align-items:flex-start" onclick="pick(this,'modell','kombination')"><div class="wiz-option-icon"><i data-lucide="shuffle" class="lu"></i></div><div style="flex:1"><div class="wiz-option-label">Kombination</div><div class="wiz-option-sub">Mehrere Tarifmodelle parallel, z. B. Budget für alle plus Erstattungsbausteine für Führungskräfte.</div><div class="wiz-option-expl">Für den Kunden: Maximale Passgenauigkeit für unterschiedliche Mitarbeitergruppen, dafür etwas mehr Erklärungsaufwand in der Kommunikation – dabei unterstützen wir Sie.</div></div><div class="wiz-check"></div></button>
   </div>
   <hr class="hr">
-  <p class="sl">Jahresbudget pro Mitarbeiter</p>
+  <p class="sl">Wie viel möchten Sie ausgeben?</p>
   <div class="field">
-    <div><span class="sbig" id="budval">600</span> <span style="font-size:14px;color:var(--ink-muted);font-weight:400">€ / Jahr</span></div>
-    <div class="ssub" id="budsub">≈ 50,00 € / Monat</div>
-    <input type="range" id="budsl" min="300" max="1500" value="600" step="50" oninput="updBud(this.value)" style="margin-top:10px">
+    <label class="l">Budget pro Mitarbeiter</label>
+    <div style="display:flex;align-items:center;gap:8px;max-width:220px">
+      <input type="number" id="budinput" min="25" max="150" step="1" value="50" oninput="updBudFromInput(this.value)" style="font-size:18px;font-weight:600;color:var(--brand);text-align:right">
+      <span style="font-size:14px;color:var(--ink-muted);white-space:nowrap">€ / Monat</span>
+    </div>
+    <div class="ssub" id="budsub" style="margin-top:6px">entspricht 600 € / Jahr</div>
+  </div>
+  <div class="field" style="margin-top:14px">
+    <div style="display:flex;align-items:baseline;justify-content:space-between"><span class="sl" style="margin-bottom:0">Passende Budgetstufe</span><span class="sbig" id="budval" style="font-size:18px">600 €/Jahr</span></div>
+    <input type="range" id="budsl" min="300" max="1500" value="600" step="50" oninput="updBud(this.value,true)" style="margin-top:10px">
     <div class="stk" id="budstk">
       <span data-v="300">300 €</span>
       <span data-v="600">600 €</span>
@@ -343,7 +350,6 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <div class="vqrow"><div class="vqtxt"><div class="vqname">Mitarbeitende sollen selbst aufstocken können</div><div class="vqdesc">Ihre Mitarbeitenden können den Tarif freiwillig und auf eigene Kosten erweitern.</div></div><div class="vqtrio" id="vq-aufstock"></div></div>
     <div class="vqrow"><div class="vqtxt"><div class="vqname">Familienangehörige mitversichern</div><div class="vqdesc">Möglichkeit, Partner oder Kinder gegen Eigenbeitrag in den Vertrag einzuschließen.</div></div><div class="vqtrio" id="vq-familie"></div></div>
     <div class="vqrow"><div class="vqtxt"><div class="vqname">Mitnahme bei Ausscheiden</div><div class="vqdesc">Mitarbeitende können den Tarif nach dem Ausscheiden privat fortführen, meist ohne erneute Gesundheitsprüfung – ein Plus für die Mitarbeiterbindung.</div></div><div class="vqtrio" id="vq-mitnahme"></div></div>
-    <div class="vqrow"><div class="vqtxt"><div class="vqname">Ausbaubares stationäres Upgrade</div><div class="vqdesc">Option auf Einzelzimmer und Chefarztbehandlung im Krankenhausfall.</div></div><div class="vqtrio" id="vq-stationaer"></div></div>
   </div>
   <div class="wiz-nav"><button class="wiz-btn wiz-btn-ghost" onclick="prev()"><i data-lucide="arrow-left" class="lu"></i> Zurück</button><button class="wiz-btn wiz-btn-primary" onclick="next()">Weiter <i data-lucide="arrow-right" class="lu"></i></button></div>
 </div>
@@ -394,10 +400,10 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <img src="https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/6a461722e10a1042fb9ce46f_Logo%20Black%20(1).png" alt="MB24">
     <span id="pdfHeaderName"></span>
   </div>
-  <div id="s7c"></div>
+  <div id="s9thanks"></div>
+  <div id="s7c" class="kh"></div>
   <div class="wiz-nav" style="margin-top:20px">
     <button class="wiz-btn wiz-btn-ghost" onclick="prev()"><i data-lucide="arrow-left" class="lu"></i> Zurück</button>
-    <button class="wiz-btn wiz-btn-primary" onclick="exportPdf()"><i data-lucide="file-down" class="lu"></i> Als PDF exportieren</button>
   </div>
 </div>
 
@@ -405,7 +411,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 
 <script>
 const TOTAL_STEPS=9;
-const PW=[0,1,2,3,5];
+const PW=[0,1,2,4];
 // Faktenbasiertes Datenmodell (Quelle: bKV-Anbieter-Masterdatenbank.md, konsolidiert aus zwei Deep-Research-Berichten 2026).
 // leistungen[kat] = {status:'ja'|'teilweise'|'nein'|'unbelegt', detail:'Originalformulierung aus der Masterdatenbank'}.
 // 'ja' nur wenn die Quelle eine volle/100%-Abdeckung explizit nennt, 'teilweise' bei Prozentsatz/Limit/separatem Baustein,
@@ -543,7 +549,7 @@ const MBSVC=[
  {id:'checkin',icon:'calendar-check-2',n:'Regelmäßige Strategie-Check-ins',d:'Feste Termine, bei denen wir gemeinsam Nutzung, Zufriedenheit und mögliche Anpassungen besprechen.',ind:'Empfehlenswert für Unternehmen, die die bKV aktiv als strategisches Instrument der Mitarbeiterbindung nutzen wollen.'}
 ];
 let cur=1;
-const S={fn:'',br:'',asp:'',pos:'',ent:'GF+HR',gdat:'',maG:0,maV:0,alts:'gemischt',beruf:'',sb:0,modell:'budget',budget:600,start:'',vrunde:'neu',prio:{z:2,b:2,v:2,h:1,k:1,au:1,p:1},prioStab:2,vq:{beitrag:'egal',pflege:'egal',aufstock:'egal',familie:'egal',mitnahme:'egal',stationaer:'egal'},vorh:'nein',exAnb:'',exTar:'',exBei:'',noti:'',mbsvc:['vso','null','anleit'],contacts:[{name:'',position:'',tel:'',email:''}]};
+const S={fn:'',br:'',asp:'',pos:'',ent:'GF+HR',gdat:'',maG:0,maV:0,alts:'gemischt',beruf:'',sb:0,modell:'budget',budget:600,start:'',vrunde:'neu',prio:{z:2,b:2,v:2,h:1,k:1,au:1,p:1},prioStab:2,vq:{beitrag:'egal',pflege:'egal',aufstock:'egal',familie:'egal',mitnahme:'egal'},vorh:'nein',exAnb:'',exTar:'',exBei:'',noti:'',mbsvc:['vso','null','anleit'],contacts:[{name:'',position:'',tel:'',email:''}]};
 function lucideRefresh(){ if(window.lucide) lucide.createIcons(); }
 function showStep(n){
   for(let i=1;i<=TOTAL_STEPS;i++){
@@ -557,9 +563,9 @@ function showStep(n){
   document.getElementById('wizHeaderName').textContent='& '+(S.fn||'Unbekanntes Unternehmen');
   if(n===4)alignBudStk();
   if(n===6)renderVQ();
-  if(n===7)renderContacts();
+  if(n===7){syncMainContact();renderContacts();}
   if(n===8)renderSvc();
-  if(n===9)renderRes();
+  if(n===9){renderThanks();renderRes();}
   lucideRefresh();
 }
 function save(){
@@ -579,7 +585,7 @@ function syncMA(){
 }
 function setVQ(key,val){S.vq[key]=val;renderVQ()}
 function renderVQ(){
-  const map={beitrag:'vq-beitrag',pflege:'vq-pflege',aufstock:'vq-aufstock',familie:'vq-familie',mitnahme:'vq-mitnahme',stationaer:'vq-stationaer'};
+  const map={beitrag:'vq-beitrag',pflege:'vq-pflege',aufstock:'vq-aufstock',familie:'vq-familie',mitnahme:'vq-mitnahme'};
   const order=['nein','egal','ja'];
   const lbl={nein:'Nein',egal:'Egal',ja:'Ja'};
   Object.keys(map).forEach(k=>{
@@ -593,6 +599,15 @@ function pick(el,key,val){
   el.classList.add('selected');S[key]=val;
 }
 function toggleEx(show){document.getElementById('exdet').classList.toggle('kh',!show)}
+// Übernimmt den in Schritt 1 erfassten Ansprechpartner als Hauptansprechpartner in Schritt 7,
+// ohne bereits eingegebene Kontaktdaten zu überschreiben.
+function syncMainContact(){
+  const main=S.contacts[0];
+  if(!main.name&&!main.position&&!main.tel&&!main.email){
+    main.name=S.asp||'';
+    main.position=S.pos||'';
+  }
+}
 function renderContacts(){
   document.getElementById('contactList').innerHTML=S.contacts.map((c,i)=>`
     <div class="contact-row">
@@ -623,14 +638,31 @@ function updSB(){
   document.getElementById('sbwarn').classList.toggle('kh',used<50);
   lucideRefresh();
 }
-function updBud(v){
+function updBud(v,fromSlider){
   v=+v;S.budget=v;
-  document.getElementById('budval').textContent=v.toLocaleString('de-DE');
-  document.getElementById('budsub').textContent='≈ '+eu(v/12)+' € / Monat';
+  document.getElementById('budval').textContent=v.toLocaleString('de-DE')+' €/Jahr';
   document.getElementById('bmtot').textContent=S.maV?(intEu(v*S.maV)+' €'):'–';
   document.getElementById('bmmav').textContent=S.maV?(S.maV+' MA'):'–';
+  if(fromSlider){
+    const bi=document.getElementById('budinput');
+    bi.value=Math.round(v/12);
+    document.getElementById('budsub').textContent='entspricht '+v.toLocaleString('de-DE')+' € / Jahr';
+  }
   renderTax();
   alignBudStk();
+}
+// Kunde gibt ein gewünschtes Monatsbudget/MA ein -> wir leiten das Jahresbudget ab und
+// runden auf die nächstgelegene der 5 gängigen Budgetstufen (300/600/900/1200/1500 €), da
+// die Anbieterdatenbank nur für diese Stufen dokumentierte Werte führt.
+const BUD_STEPS=[300,600,900,1200,1500];
+function updBudFromInput(monthly){
+  monthly=+monthly;
+  if(!monthly||monthly<0){document.getElementById('budsub').textContent='Bitte einen Betrag eingeben';return;}
+  const yearly=monthly*12;
+  const nearest=BUD_STEPS.reduce((a,b)=>Math.abs(b-yearly)<Math.abs(a-yearly)?b:a);
+  document.getElementById('budsub').textContent='entspricht '+intEu(yearly)+' € / Jahr · nächstgelegene Budgetstufe: '+nearest.toLocaleString('de-DE')+' €';
+  document.getElementById('budsl').value=nearest;
+  updBud(nearest);
 }
 // Positioniert die Tick-Labels exakt an der realen Thumb-Trajektorie des Sliders
 // (Innenabstand = halbe Thumb-Breite), statt sie prozentual über die volle Breite zu verteilen.
@@ -663,7 +695,7 @@ function renderTax(){
   document.getElementById('taxstat').innerHTML=h;
   lucideRefresh();
 }
-const PLBLS=['–','Nice','Wichtig','Sehr wichtig','Muss'];
+const PLBLS=['Nicht wichtig','Egal','Wichtig','Muss enthalten sein'];
 function renderPrio(){
   document.getElementById('priogrid').innerHTML=LEIST.map(l=>`
   <div class="pcard"><div class="ptop"><div class="pico"><i data-lucide="${l.icon}" class="lu"></i></div><div><div class="pname">${l.n}</div><div class="pdsc">${l.d}</div></div></div>
@@ -733,6 +765,28 @@ const COV_LABEL={ja:'dokumentiert enthalten',teilweise:'dokumentiert teilweise/m
 function covDot(status){
   return `<span title="${COV_LABEL[status]||''}" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:4px;background:${COV_COLOR[status]}1a"><i data-lucide="${COV_ICON[status]||'help-circle'}" class="lu" style="width:11px;height:11px;color:${COV_COLOR[status]}"></i></span>`;
 }
+// Zeigt einen Dankestext plus Anbieter-Übersicht statt der detaillierten Auswertung.
+// Der eigentliche Vergleich (renderRes) läuft weiterhin im Hintergrund für den Google-Sheets-Export.
+function renderThanks(){
+  const custName=S.fn||'Ihr Unternehmen';
+  document.getElementById('pdfTitleName').textContent=custName;
+  document.getElementById('pdfHeaderName').textContent='& '+custName;
+  const logos=PROV.map(p=>`<div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+    <div class="cbdg" style="background:${p.c};width:56px;height:56px;border-radius:14px;font-size:14px">${p.a}</div>
+    <span style="font-size:11px;color:var(--ink-muted);text-align:center;max-width:80px">${esc(p.n)}</span>
+  </div>`).join('');
+  document.getElementById('s9thanks').innerHTML=`
+    <div class="wiz-rec" style="text-align:center;padding:32px 24px">
+      <i data-lucide="check-circle-2" class="lu" style="width:40px;height:40px;color:var(--brand);margin-bottom:14px"></i>
+      <div style="font-size:19px;font-weight:600;color:var(--ink);margin-bottom:10px">Vielen Dank für Ihr Vertrauen und Ihre Eingaben.</div>
+      <div style="font-size:14px;color:var(--ink-mid);max-width:480px;margin:0 auto">Unser Team wird Ihre Anforderungen auswerten und mit den besten Tarifen wieder auf Sie zukommen.</div>
+    </div>
+    <div style="margin-top:24px">
+      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted);text-align:center;margin-bottom:18px">Wir vergleichen für Sie unter anderem</div>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:20px 16px">${logos}</div>
+    </div>`;
+  lucideRefresh();
+}
 function renderRes(){
   const custName=S.fn||'Unbekanntes Unternehmen';
   document.getElementById('pdfTitleName').textContent=custName;
@@ -744,7 +798,7 @@ function renderRes(){
   const elig=res.filter(r=>r.eligible&&r.score!=null),noData=res.filter(r=>r.eligible&&r.score==null);
   const sL=[...LEIST].sort((a,b)=>(S.prio[b.id]||0)-(S.prio[a.id]||0));
   const fmtM=m=>{try{return new Date(m).toLocaleString('de-DE',{day:'2-digit',month:'long',year:'numeric'})}catch{return m}};
-  const VQL={beitrag:'Beitragsbefreiung',pflege:'Pflegeoption',aufstock:'Aufstockung',familie:'Familienversicherung',mitnahme:'Mitnahme n. Ausscheiden',stationaer:'Stationäres Upgrade'};
+  const VQL={beitrag:'Beitragsbefreiung',pflege:'Pflegeoption',aufstock:'Aufstockung',familie:'Familienversicherung',mitnahme:'Mitnahme n. Ausscheiden'};
   const vqJa=Object.keys(S.vq).filter(k=>S.vq[k]==='ja');
   const MODL={budget:'Budgettarif',erstattung:'Bausteintarif',kombination:'Kombi-Tarif'};
   let h=`<div class="wiz-rec"><div class="wiz-rec-label"><i data-lucide="clipboard" class="lu"></i>Gesprächsnotiz</div>
