@@ -10,8 +10,8 @@
 :root{--brand:#7447d7;--brand-dark:#5532a8;--brand-light:#ede8fb;--brand-xlight:#f5f2fd;--ink:#1C1C1A;--ink-mid:#4A4A47;--ink-muted:#8A8A86;--surface:#ffffff;--border:#E3E3DF;--radius:16px;--radius-sm:10px;--font:'Poppins',sans-serif}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{background:#EAE7FF;overflow:hidden;font-weight:300}
-.bkv-wizard{font-family:var(--font);font-weight:300;background:#EAE7FF;padding:36px 40px;width:100%;height:100vh;margin:0 auto;overflow-y:auto;-webkit-overflow-scrolling:touch}
+body{background:var(--surface);overflow:hidden;font-weight:300}
+.bkv-wizard{font-family:var(--font);font-weight:300;background:var(--surface);padding:36px 40px;width:100%;height:100vh;margin:0 auto;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .lu{width:16px;height:16px;stroke-width:2;flex-shrink:0;vertical-align:-3px}
 .wiz-header{display:flex;align-items:center;gap:10px;margin-bottom:20px}
 .wiz-header img{height:24px;width:auto}
@@ -212,7 +212,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <div class="field"><label class="l">Position / Funktion</label><input type="text" id="pos" placeholder="HR-Leitung, Geschäftsführer …"></div>
   </div>
   <hr class="hr">
-  <p class="sl">Wer entscheidet?</p>
+  <p class="sl">Wer entscheidet auf Kundenseite?</p>
   <div class="wiz-options">
     <button class="wiz-option" onclick="pick(this,'ent','HR')"><div class="wiz-option-icon"><i data-lucide="user" class="lu"></i></div><div class="wiz-option-label">HR-Leitung</div><div class="wiz-check"></div></button>
     <button class="wiz-option selected" onclick="pick(this,'ent','GF+HR')"><div class="wiz-option-icon"><i data-lucide="users" class="lu"></i></div><div class="wiz-option-label">HR + GF gemeinsam</div><div class="wiz-check"></div></button>
@@ -908,20 +908,47 @@ function renderRes(){
 // Trägt sich selbst als "einmal pro Auswertung" ein, damit erneutes Rendern (z.B. durch
 // Zurück-/Vor-Navigation) nicht wiederholt Zeilen im Sheet anlegt.
 let lastSentSnapshot=null;
-const GSHEET_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbxxl4NDu8c6D_xSAvEz2bvKKD9JOPPmPVekizDTmjFUi22zna-g72Uq8VJnGJvOJIdA/exec';
+const GSHEET_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbz4RuoeGcG3jiqOvKVoQm6wV5IJo05rTwi3oHngaSc8HWaj1AO8wsgKd5_41X2kbbJ5HQ/exec';
+const VQL_FULL={beitrag:'Beitragsbefreiung gewünscht',pflege:'Pflegeoption gewünscht',aufstock:'Aufstockung durch MA gewünscht',familie:'Familienversicherung gewünscht',mitnahme:'Mitnahme bei Ausscheiden gewünscht'};
+const ENT_LBL={HR:'HR-Leitung',['GF+HR']:'HR + GF gemeinsam',GF:'Geschäftsführung',unklar:'Noch unklar'};
+// Vollständiges Beratungsprotokoll: jede Eingabe des Kunden wird als eigene Spalte übertragen,
+// nicht nur das Scoring-Ergebnis. Reihenfolge folgt dem Wizard-Ablauf (Schritt 1 -> 8).
 function sendToSheet(elig){
   if(!GSHEET_WEBHOOK_URL)return;
-  const mainContact=S.contacts.find(c=>c.name||c.tel||c.email)||{};
+  const mainContact=S.contacts[0]||{};
+  const otherContacts=S.contacts.slice(1).filter(c=>c.name||c.tel||c.email);
   const MODL={budget:'Budgettarif',erstattung:'Bausteintarif',kombination:'Kombi-Tarif'};
+  const ALTS_LBL={gemischt:'Gemischt (Ø 33–48)',jung:'Überwiegend jung (Ø < 33)',erfahren:'Überwiegend erfahren (Ø > 48)'};
+  const prioText=LEIST.map(l=>`${l.n}: ${PLBLS[S.prio[l.id]||0]}`).join(' | ');
+  const stabText=S.prioStab!=null?PLBLS[S.prioStab]:'';
+  const vqText=Object.keys(VQL_FULL).map(k=>`${VQL_FULL[k]}: ${S.vq[k]==='ja'?'Ja':S.vq[k]==='nein'?'Nein':'Egal'}`).join(' | ');
+  const mbsvcText=S.mbsvc.map(id=>MBSVC.find(s=>s.id===id)?.n||id).join(', ');
+  const otherContactsText=otherContacts.map(c=>`${c.name} (${c.position||'ohne Position'}, ${c.tel||'ohne Telefon'}, ${c.email||'ohne E-Mail'})`).join(' / ');
   const payload={
-    firmenname:S.fn,branche:S.br,mitarbeiterVersicherbar:S.maV,jahresbudget:S.budget,
-    tarifmodell:MODL[S.modell]||S.modell,wunschStart:S.start,
+    // Schritt 1 – Kundendaten
+    firmenname:S.fn,branche:S.br,ansprechpartnerS1:S.asp,positionS1:S.pos,entscheidungstraeger:ENT_LBL[S.ent]||S.ent,gespraechsdatum:S.gdat,
+    // Schritt 2 – Mitarbeiterstruktur
+    mitarbeiterGesamt:S.maG,mitarbeiterVersicherbar:S.maV,durchschnittsalter:ALTS_LBL[S.alts]||S.alts,berufsgruppe:S.beruf,
+    // Schritt 3 – Sachbezüge
+    sachbezuegeGenutzt:S.sb,
+    // Schritt 4 – Budget & Modell
+    tarifmodell:MODL[S.modell]||S.modell,jahresbudget:S.budget,wunschStart:S.start,vertragsrunde:S.vrunde,
+    // Schritt 5 – Leistungspriorisierung
+    leistungspriorisierung:prioText,beitragsstabilitaetPrioritaet:stabText,
+    // Schritt 6 – Vertragsdetails
+    vertragsdetails:vqText,
+    // Schritt 7 – Wettbewerb & Ansprechpartner
+    bestehendesAngebot:S.vorh,bestehenderAnbieter:S.exAnb,bestehenderTarif:S.exTar,bestehenderBeitrag:S.exBei,
     hauptansprechpartnerName:mainContact.name||'',hauptansprechpartnerPosition:mainContact.position||'',
     hauptansprechpartnerTel:mainContact.tel||'',hauptansprechpartnerEmail:mainContact.email||'',
+    weitereAnsprechpartner:otherContactsText,
+    notizen:S.noti,
+    // Schritt 8 – MB24-Leistungen
+    mb24Leistungen:mbsvcText,
+    // Auswertung (intern, nicht mehr im Kunden-UI sichtbar)
     empfehlung1Name:elig[0]?.n||'',empfehlung1Match:elig[0]?.score??'',
     empfehlung2Name:elig[1]?.n||'',empfehlung2Match:elig[1]?.score??'',
-    empfehlung3Name:elig[2]?.n||'',empfehlung3Match:elig[2]?.score??'',
-    notizen:S.noti
+    empfehlung3Name:elig[2]?.n||'',empfehlung3Match:elig[2]?.score??''
   };
   const snapshot=JSON.stringify(payload);
   if(snapshot===lastSentSnapshot)return;
