@@ -290,32 +290,24 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <button class="wiz-option" style="align-items:flex-start" onclick="pick(this,'modell','erstattung')"><div class="wiz-option-icon"><i data-lucide="file-text" class="lu"></i></div><div style="flex:1"><div class="wiz-option-label">Bausteintarif</div><div class="wiz-option-sub">Einzelne Leistungsbereiche (z. B. Zahn, Sehhilfe, Krankenhaus) werden separat als Baustein gewählt und nach fixen Sätzen erstattet.</div><div class="wiz-option-expl">Für den Kunden: Höhere Erstattungen bei klar definierten Leistungen möglich, dafür weniger Flexibilität als beim Budgettarif. Gut, wenn bestimmte Bedarfe (z. B. Zahn) im Vordergrund stehen und gezielt abgesichert werden sollen.</div></div><div class="wiz-check"></div></button>
     <button class="wiz-option" style="align-items:flex-start" onclick="pick(this,'modell','kombination')"><div class="wiz-option-icon"><i data-lucide="shuffle" class="lu"></i></div><div style="flex:1"><div class="wiz-option-label">Kombination</div><div class="wiz-option-sub">Mehrere Tarifmodelle parallel, z. B. Budget für alle plus Erstattungsbausteine für Führungskräfte.</div><div class="wiz-option-expl">Für den Kunden: Maximale Passgenauigkeit für unterschiedliche Mitarbeitergruppen, dafür etwas mehr Erklärungsaufwand in der Kommunikation – dabei unterstützen wir Sie.</div></div><div class="wiz-check"></div></button>
   </div>
+  <div class="kh">
   <hr class="hr">
   <p class="sl">Wie viel möchten Sie ausgeben?</p>
   <div class="field">
-    <label class="l">Budget pro Mitarbeiter</label>
+    <label class="l">Arbeitgeberbeitrag pro Mitarbeiter</label>
     <div style="display:flex;align-items:center;gap:8px;max-width:220px">
-      <input type="number" id="budinput" min="25" max="150" step="1" value="50" oninput="updBudFromInput(this.value)" style="font-size:18px;font-weight:600;color:var(--brand);text-align:right">
+      <input type="number" id="budinput" min="5" max="200" step="1" value="50" oninput="updBudFromInput(this.value)" style="font-size:18px;font-weight:600;color:var(--brand);text-align:right">
       <span style="font-size:14px;color:var(--ink-muted);white-space:nowrap">€ / Monat</span>
     </div>
-    <div class="ssub" id="budsub" style="margin-top:6px">entspricht 600 € / Jahr</div>
-  </div>
-  <div class="field" style="margin-top:14px">
-    <div style="display:flex;align-items:baseline;justify-content:space-between"><span class="sl" style="margin-bottom:0">Passende Budgetstufe</span><span class="sbig" id="budval" style="font-size:18px">600 €/Jahr</span></div>
-    <input type="range" id="budsl" min="300" max="1500" value="600" step="50" oninput="updBud(this.value,true)" style="margin-top:10px">
-    <div class="stk" id="budstk">
-      <span data-v="300">300 €</span>
-      <span data-v="600">600 €</span>
-      <span data-v="900">900 €</span>
-      <span data-v="1200">1.200 €</span>
-      <span data-v="1500">1.500 €</span>
-    </div>
+    <div class="ssub" id="budsub" style="margin-top:6px">Wie viel Jahresbudget das für Ihre Mitarbeitenden ergibt, hängt vom Versicherer ab – manche Tarife wandeln denselben Beitrag in ein deutlich höheres Budget um als andere.</div>
   </div>
   <div class="bm" style="grid-template-columns:1fr 1fr">
-    <div><div class="bmv" id="bmtot">–</div><div class="bml">Jahresbudget gesamt</div></div>
+    <div><div class="bmv" id="bmtot">–</div><div class="bml">Jahresbeitrag gesamt</div></div>
     <div><div class="bmv" id="bmmav">–</div><div class="bml">Versicherte MA</div></div>
   </div>
+  <div id="budgetPreview"></div>
   <div id="taxstat"></div>
+  </div>
   <hr class="hr">
   <div class="g2">
     <div class="field"><label class="l">Wunsch-Starttermin</label>
@@ -343,6 +335,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 <div class="wiz-screen" id="s6">
   <p class="wiz-eyebrow">Schritt 6 · Vertragsdetails</p>
   <h2 class="wiz-title">Welche Vertragsdetails sind Ihnen wichtig?</h2>
+  <p class="wiz-sub">Diese Wünsche werden in der Gesprächsnotiz festgehalten und sollten im finalen Angebot mit dem Versicherer abgeglichen werden. Da für diese Merkmale keine geprüfte Datenbasis über alle Anbieter vorliegt, fließen sie <strong>nicht</strong> in den Match-Score ein.</p>
   <div style="border:1.5px solid var(--border);border-radius:12px;padding:4px 16px">
     <div class="vqrow"><div class="vqtxt"><div class="vqname">Beitragsbefreiung im Tarif</div><div class="vqdesc">Der Arbeitgeberbeitrag entfällt bei Elternzeit, Pflegezeit oder längerer Arbeitsunfähigkeit – meist gegen einen kleinen Aufpreis.</div></div><div class="vqtrio" id="vq-beitrag"></div></div>
     <div class="vqrow"><div class="vqtxt"><div class="vqname">Pflegeoption gewünscht</div><div class="vqdesc">Ergänzender Baustein für den Pflegefall – nicht jeder Anbieter führt das im bKV-Tarif.</div></div><div class="vqtrio" id="vq-pflege"></div></div>
@@ -403,6 +396,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   <div id="s7c" class="kh"></div>
   <div class="wiz-nav" style="margin-top:20px">
     <button class="wiz-btn wiz-btn-ghost" onclick="prev()"><i data-lucide="arrow-left" class="lu"></i> Zurück</button>
+    <button class="wiz-btn wiz-btn-primary" onclick="exportPdf()"><i data-lucide="file-down" class="lu"></i> Als PDF exportieren</button>
   </div>
 </div>
 
@@ -548,7 +542,7 @@ const MBSVC=[
  {id:'checkin',icon:'calendar-check-2',n:'Regelmäßige Strategie-Check-ins',d:'Feste Termine, bei denen wir gemeinsam Nutzung, Zufriedenheit und mögliche Anpassungen besprechen.',ind:'Empfehlenswert für Unternehmen, die die bKV aktiv als strategisches Instrument der Mitarbeiterbindung nutzen wollen.'}
 ];
 let cur=1;
-const S={fn:'',br:'',asp:'',pos:'',ent:'GF+HR',gdat:'',maG:0,maV:0,alts:'gemischt',beruf:'',sb:0,modell:'budget',budget:600,start:'',vrunde:'neu',prio:{z:2,b:2,v:2,h:1,k:1,au:1,p:1},prioStab:2,vq:{beitrag:'egal',pflege:'egal',aufstock:'egal',familie:'egal',mitnahme:'egal'},vorh:'nein',exAnb:'',exTar:'',exBei:'',noti:'',mbsvc:['vso','null','anleit'],contacts:[{name:'',position:'',tel:'',email:''}]};
+const S={fn:'',br:'',asp:'',pos:'',ent:'GF+HR',gdat:'',maG:0,maV:0,alts:'gemischt',beruf:'',sb:0,modell:'budget',budget:600,beitragMonatlich:50,start:'',vrunde:'neu',prio:{z:2,b:2,v:2,h:1,k:1,au:1,p:1},prioStab:2,vq:{beitrag:'egal',pflege:'egal',aufstock:'egal',familie:'egal',mitnahme:'egal'},vorh:'nein',exAnb:'',exTar:'',exBei:'',noti:'',mbsvc:['vso','null','anleit'],contacts:[{name:'',position:'',tel:'',email:''}]};
 function lucideRefresh(){ if(window.lucide) lucide.createIcons(); }
 function showStep(n){
   for(let i=1;i<=TOTAL_STEPS;i++){
@@ -560,7 +554,6 @@ function showStep(n){
   cur=n;window.scrollTo({top:0,behavior:'smooth'});
   document.getElementById('wizHeader').classList.toggle('kh',n<2);
   document.getElementById('wizHeaderName').textContent='& '+(S.fn||'Unbekanntes Unternehmen');
-  if(n===4)alignBudStk();
   if(n===6)renderVQ();
   if(n===7){syncMainContact();renderContacts();}
   if(n===8)renderSvc();
@@ -572,7 +565,7 @@ function save(){
   if(cur===1){S.fn=g('fn');S.br=g('br');S.asp=g('asp');S.pos=g('pos');S.gdat=g('gdat')}
   if(cur===2){S.maG=+g('mag')||0;S.maV=+g('mav')||0;S.alts=g('alts');S.beruf=g('beruf')}
   if(cur===3){S.sb=(+g('sb1')||0)+(+g('sb2')||0)+(+g('sb3')||0)+(+g('sb4')||0)}
-  if(cur===4){S.budget=+g('budsl')||600;S.start=g('start');S.vrunde=g('vrunde')}
+  if(cur===4){S.beitragMonatlich=+g('budinput')||S.beitragMonatlich;S.start=g('start');S.vrunde=g('vrunde')}
   if(cur===7){S.exAnb=g('exanb');S.exTar=g('extar');S.exBei=g('exbei');S.noti=g('noti')}
 }
 function next(){save();showStep(Math.min(cur+1,TOTAL_STEPS))}
@@ -637,48 +630,39 @@ function updSB(){
   document.getElementById('sbwarn').classList.toggle('kh',used<50);
   lucideRefresh();
 }
-function updBud(v,fromSlider){
-  v=+v;S.budget=v;
-  document.getElementById('budval').textContent=v.toLocaleString('de-DE')+' €/Jahr';
-  document.getElementById('bmtot').textContent=S.maV?(intEu(v*S.maV)+' €'):'–';
-  document.getElementById('bmmav').textContent=S.maV?(S.maV+' MA'):'–';
-  if(fromSlider){
-    const bi=document.getElementById('budinput');
-    bi.value=Math.round(v/12);
-    document.getElementById('budsub').textContent='entspricht '+v.toLocaleString('de-DE')+' € / Jahr';
-  }
-  renderTax();
-  alignBudStk();
+// Der AG-Beitrag ist die einzige Eingabe des Kunden. Wie viel Jahresbudget das für die
+// Mitarbeitenden bedeutet, hängt vom jeweiligen Anbieter ab (jeder Anbieter wandelt den
+// gleichen Beitrag unterschiedlich stark in Budget um) - siehe budgetForProvider().
+// S.budget selbst dient nur noch als Median-Richtwert für Anzeige/Protokoll, NICHT mehr
+// als harter Filter im Scoring (das übernimmt scoreProv() direkt anbieterspezifisch).
+function budgetForProvider(p,monthly){
+  if(!monthly||!p.beitrag||!p.beitragBudget)return null;
+  return monthly/p.beitrag*p.beitragBudget;
 }
-// Kunde gibt ein gewünschtes Monatsbudget/MA ein -> wir leiten das Jahresbudget ab und
-// runden auf die nächstgelegene der 5 gängigen Budgetstufen (300/600/900/1200/1500 €), da
-// die Anbieterdatenbank nur für diese Stufen dokumentierte Werte führt.
-const BUD_STEPS=[300,600,900,1200,1500];
 function updBudFromInput(monthly){
   monthly=+monthly;
-  if(!monthly||monthly<0){document.getElementById('budsub').textContent='Bitte einen Betrag eingeben';return;}
-  const yearly=monthly*12;
-  const nearest=BUD_STEPS.reduce((a,b)=>Math.abs(b-yearly)<Math.abs(a-yearly)?b:a);
-  document.getElementById('budsub').textContent='entspricht '+intEu(yearly)+' € / Jahr · nächstgelegene Budgetstufe: '+nearest.toLocaleString('de-DE')+' €';
-  document.getElementById('budsl').value=nearest;
-  updBud(nearest);
+  S.beitragMonatlich=monthly;
+  if(!monthly||monthly<0){
+    document.getElementById('budsub').textContent='Bitte einen Betrag eingeben';
+    document.getElementById('budgetPreview').innerHTML='';
+    return;
+  }
+  const estimates=PROV.map(p=>({n:p.n,budget:budgetForProvider(p,monthly)})).filter(e=>e.budget!=null);
+  if(estimates.length){
+    const sorted=estimates.map(e=>e.budget).sort((a,b)=>a-b);
+    const median=sorted[Math.floor(sorted.length/2)];
+    S.budget=Math.round(median);
+    const min=Math.round(Math.min(...sorted)),max=Math.round(Math.max(...sorted));
+    document.getElementById('budgetPreview').innerHTML=`<div class="ib b"><i data-lucide="info" class="lu"></i><div>Bei ${eu(monthly)} € Arbeitgeberbeitrag ergibt sich je nach Versicherer ein Jahresbudget zwischen ca. <strong>${intEu(min)} €</strong> und <strong>${intEu(max)} €</strong> pro Mitarbeiter (Median ca. ${intEu(median)} €). Welcher Anbieter wie viel Budget für diesen Beitrag bietet, sehen Sie im Vergleich in der Auswertung.</div></div>`;
+  }else{
+    S.budget=monthly*12;
+    document.getElementById('budgetPreview').innerHTML='';
+  }
+  document.getElementById('bmtot').textContent=S.maV?(intEu(monthly*12*S.maV)+' €'):'–';
+  document.getElementById('bmmav').textContent=S.maV?(S.maV+' MA'):'–';
+  renderTax();
+  lucideRefresh();
 }
-// Positioniert die Tick-Labels exakt an der realen Thumb-Trajektorie des Sliders
-// (Innenabstand = halbe Thumb-Breite), statt sie prozentual über die volle Breite zu verteilen.
-function alignBudStk(){
-  const sl=document.getElementById('budsl');
-  const stk=document.getElementById('budstk');
-  if(!sl||!stk||!sl.offsetWidth)return;
-  const min=+sl.min,max=+sl.max,thumb=20;
-  const w=sl.offsetWidth;
-  stk.querySelectorAll('span').forEach(span=>{
-    const val=+span.dataset.v;
-    const pct=(val-min)/(max-min);
-    const px=thumb/2+pct*(w-thumb);
-    span.style.left=px+'px';
-  });
-}
-window.addEventListener('resize',alignBudStk);
 function renderTax(){
   const ma20=S.maV>=20;
   let h='';
@@ -738,8 +722,11 @@ function coverageValue(status){
 // Keine Anbieter-ID fließt je in die Formel ein, kein Bonus/Malus, keine Heuristik ohne Kundeneingabe.
 function scoreProv(p){
   if(S.maV<p.mA)return{score:null,eligible:false,reason:'mindestens '+p.mA+' MA nötig ('+S.maV+' verfügbar)'};
-  if(S.budget>p.mB)return{score:null,eligible:false,reason:'Budget übersteigt das dokumentierte Maximum von '+p.mB+' €'};
-  if(S.budget<p.mBmin)return{score:null,eligible:false,reason:'Budget liegt unter der dokumentierten Mindeststufe von '+p.mBmin+' €'};
+  // Budget wird pro Anbieter aus dem eingegebenen AG-Beitrag hochgerechnet (nicht pauschal
+  // gleichgesetzt), da derselbe Beitrag je Versicherer ein unterschiedlich hohes Budget ergibt.
+  const estBudget=budgetForProvider(p,S.beitragMonatlich)??S.budget;
+  if(estBudget>p.mB)return{score:null,eligible:false,reason:'Bei diesem Beitrag ergäbe sich ein Budget über dem dokumentierten Maximum von '+p.mB+' €'};
+  if(estBudget<p.mBmin)return{score:null,eligible:false,reason:'Bei diesem Beitrag läge das Budget unter der dokumentierten Mindeststufe von '+p.mBmin+' €'};
   if(!p.mo.includes(S.modell)&&S.modell!=='kombination')return{score:null,eligible:false,reason:'Tarifmodell "'+S.modell+'" ist für diesen Anbieter nicht dokumentiert'};
   let sc=0,mx=0,unbelegt=0,belegt=0;
   for(const l of LEIST){
@@ -770,19 +757,11 @@ function renderThanks(){
   const custName=S.fn||'Ihr Unternehmen';
   document.getElementById('pdfTitleName').textContent=custName;
   document.getElementById('pdfHeaderName').textContent='& '+custName;
-  const logos=PROV.map(p=>`<div style="display:flex;flex-direction:column;align-items:center;gap:8px">
-    <div class="cbdg" style="background:${p.c};width:56px;height:56px;border-radius:14px;font-size:14px">${p.a}</div>
-    <span style="font-size:11px;color:var(--ink-muted);text-align:center;max-width:80px">${esc(p.n)}</span>
-  </div>`).join('');
   document.getElementById('s9thanks').innerHTML=`
     <div class="wiz-rec" style="text-align:center;padding:32px 24px">
       <i data-lucide="check-circle-2" class="lu" style="width:40px;height:40px;color:var(--brand);margin-bottom:14px"></i>
       <div style="font-size:19px;font-weight:600;color:var(--ink);margin-bottom:10px">Vielen Dank für Ihr Vertrauen und Ihre Eingaben.</div>
       <div style="font-size:14px;color:var(--ink-mid);max-width:480px;margin:0 auto">Unser Team wird Ihre Anforderungen auswerten und mit den besten Tarifen wieder auf Sie zukommen.</div>
-    </div>
-    <div style="margin-top:24px">
-      <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted);text-align:center;margin-bottom:18px">Wir vergleichen für Sie unter anderem</div>
-      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:20px 16px">${logos}</div>
     </div>`;
   lucideRefresh();
 }
@@ -805,7 +784,7 @@ function renderRes(){
     <div class="wiz-rec-pills">
       ${S.br?`<span class="wiz-pill">${esc(S.br)}</span>`:''}
       <span class="wiz-pill">${S.maV||'?'} MA versicherbar</span>
-      <span class="wiz-pill">${S.budget.toLocaleString('de-DE')} € / MA / Jahr</span>
+      <span class="wiz-pill">${eu(S.beitragMonatlich)} € AG-Beitrag / MA / Monat</span>
       <span class="wiz-pill">${MODL[S.modell]||ucf(S.modell)}</span>
       ${S.start?`<span class="wiz-pill">Start: ${fmtM(S.start)}</span>`:''}
       ${S.vorh==='ja'?`<span class="wiz-pill">Bestehendes Angebot: ${esc(S.exAnb||'vorhanden')}</span>`:''}
@@ -846,7 +825,7 @@ function renderRes(){
           <div class="cbdg" style="background:${w.c};width:42px;height:42px;border-radius:10px;font-size:12px">${w.a}</div>
           <div style="flex:1"><div style="font-size:18px;font-weight:600;color:var(--ink)">${esc(w.n)}</div>
           <span style="font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;background:${w.tBg};color:${w.tC}">${w.tag}</span></div>
-          ${w.beitragKonf==='hoch'||w.beitragKonf==='mittel'?`<div style="text-align:right"><div style="font-size:15px;font-weight:600;color:var(--brand)">ab ${eu(w.beitrag)} €</div><div style="font-size:10px;color:var(--ink-muted)">bei ${w.beitragBudget} € Budget · ${w.beitragKonf==='hoch'?'gut belegt':'Richtwert'}</div></div>`:''}
+          ${(()=>{const est=budgetForProvider(w,S.beitragMonatlich);if(est==null)return'';return `<div style="text-align:right"><div style="font-size:15px;font-weight:600;color:var(--brand)">≈ ${intEu(est)} € Budget</div><div style="font-size:10px;color:var(--ink-muted)">bei ${eu(S.beitragMonatlich)} € AG-Beitrag · ${w.beitragKonf==='hoch'?'gut belegt':'Richtwert'}</div></div>`;})()}
         </div>
         <div style="font-size:13px;color:var(--ink-mid);line-height:1.55;margin-bottom:12px">${esc(summary)}</div>
         <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:${w.w?'10px':'0'}">
@@ -931,7 +910,7 @@ function sendToSheet(elig){
     // Schritt 3 – Sachbezüge
     sachbezuegeGenutzt:S.sb,
     // Schritt 4 – Budget & Modell
-    tarifmodell:MODL[S.modell]||S.modell,jahresbudget:S.budget,wunschStart:S.start,vertragsrunde:S.vrunde,
+    tarifmodell:MODL[S.modell]||S.modell,agBeitragProMonat:S.beitragMonatlich,jahresbudgetMedianSchaetzung:S.budget,wunschStart:S.start,vertragsrunde:S.vrunde,
     // Schritt 5 – Leistungspriorisierung
     leistungspriorisierung:prioText,beitragsstabilitaetPrioritaet:stabText,
     // Schritt 6 – Vertragsdetails
@@ -973,7 +952,7 @@ function exportPdf(){
   document.getElementById('gdat').value=new Date().toISOString().slice(0,10);
   const nm=new Date();nm.setMonth(nm.getMonth()+1);nm.setDate(1);
   document.getElementById('start').value=nm.toISOString().slice(0,10);
-  renderPrio();renderVQ();updBud(600);showStep(1);
+  renderPrio();renderVQ();updBudFromInput(50);showStep(1);
 })();
 </script>
 </body>
