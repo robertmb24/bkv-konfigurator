@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>bKV Konfigurator | Mitarbeiterbindung24</title>
+<title>bKV Konfigurator | MB24</title>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
@@ -55,6 +55,20 @@ body{background:var(--surface);overflow:hidden;font-weight:300}
 .wiz-rec-text{font-size:13px;font-weight:300;color:var(--ink-mid);line-height:1.65}
 .wiz-rec-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .wiz-pill{font-size:12px;font-weight:500;color:var(--brand-dark);background:var(--brand-light);padding:4px 12px;border-radius:100px;display:inline-flex;align-items:center;gap:4px}
+.proto-section{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.proto-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.proto-section-title .lu{width:13px;height:13px;color:var(--brand)}
+.proto-row{display:flex;justify-content:space-between;gap:16px;padding:6px 0;font-size:13px;border-top:1px solid var(--border)}
+.proto-row:first-of-type{border-top:none}
+.proto-label{color:var(--ink-muted);flex-shrink:0}
+.proto-value{color:var(--ink);font-weight:500;text-align:right}
+.proto-notes{font-size:12.5px;color:var(--ink-mid);line-height:1.55}
+.partner-logos-section{margin-top:22px;text-align:center}
+.partner-logos-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted);margin-bottom:16px}
+.partner-logos-grid{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:24px 32px;padding:0 12px}
+.partner-logo{height:32px;width:auto;max-width:110px;object-fit:contain;filter:grayscale(1);opacity:.65;transition:filter .15s,opacity .15s}
+.partner-logo:hover{filter:grayscale(0);opacity:1}
+@media(max-width:600px){.partner-logo{height:26px}}
 @media(max-width:768px){.bkv-wizard{padding:28px 24px}}
 @media(max-width:600px){.bkv-wizard{padding:20px 16px}.wiz-options{grid-template-columns:1fr}.wiz-title{font-size:18px}.wiz-nav{flex-direction:column-reverse}.wiz-nav .wiz-btn{width:100%;justify-content:center}}
 /* === Erweiterungen === */
@@ -97,6 +111,13 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 .pb.s2{background:var(--brand-light);border-color:var(--brand-light);color:var(--brand-dark)}
 .pb.s3{background:var(--brand);border-color:var(--brand);color:#fff}
 .pb.s4{background:var(--brand-dark);border-color:var(--brand-dark);color:#fff}
+.star-row{display:flex;align-items:center;gap:4px}
+.star-x,.star-btn{background:none;border:none;padding:5px;cursor:pointer;border-radius:6px;color:var(--ink-muted);display:flex;align-items:center;justify-content:center;transition:all .12s}
+.star-x:hover,.star-btn:hover{background:var(--brand-xlight);color:var(--brand)}
+.star-x .lu,.star-btn .lu{width:18px;height:18px}
+.star-x.active{background:#fee2e2;color:#dc2626}
+.star-btn.filled{color:var(--brand)}
+.star-btn.filled .lu{fill:var(--brand)}
 .meter{background:var(--brand-xlight);border:1.5px solid var(--border);border-radius:10px;padding:15px;margin-top:14px}
 .mtrk{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin:8px 0 6px}
 .mfll{height:100%;border-radius:4px;transition:width .3s,background .3s}
@@ -150,7 +171,9 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 .svc-indic strong{font-weight:500;color:var(--ink-mid)}
 .pdf-title{display:none}
 .pdf-header{display:none}
+.print-only{display:none}
 @media print{
+  .print-only{display:block!important}
   .wiz-nav,.wiz-progress{display:none!important}
   html,body{height:auto!important;overflow:visible!important}
   .bkv-wizard{height:auto!important;overflow:visible!important;padding:0 40px!important}
@@ -162,7 +185,8 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   .pdf-header{display:flex;align-items:center;gap:10px;position:fixed;top:0;left:0;right:0;padding:0 40px 14px;border-bottom:1px solid var(--border);background:#fff;z-index:1}
   .pdf-header img{height:22px;width:auto}
   .pdf-header span{font-size:12.5px;font-weight:500;color:var(--ink-mid)}
-  #s7c{margin-top:26mm}
+  #s7c,#s9protocol{margin-top:26mm}
+  .partner-logos-section{display:none!important}
   .tbl-scroll{overflow-x:visible!important}
   .cmp-table-wrap{display:none!important}
   table{page-break-inside:auto;break-inside:auto}
@@ -290,7 +314,6 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <button class="wiz-option" style="align-items:flex-start" onclick="pick(this,'modell','erstattung')"><div class="wiz-option-icon"><i data-lucide="file-text" class="lu"></i></div><div style="flex:1"><div class="wiz-option-label">Bausteintarif</div><div class="wiz-option-sub">Einzelne Leistungsbereiche (z. B. Zahn, Sehhilfe, Krankenhaus) werden separat als Baustein gewählt und nach fixen Sätzen erstattet.</div><div class="wiz-option-expl">Für den Kunden: Höhere Erstattungen bei klar definierten Leistungen möglich, dafür weniger Flexibilität als beim Budgettarif. Gut, wenn bestimmte Bedarfe (z. B. Zahn) im Vordergrund stehen und gezielt abgesichert werden sollen.</div></div><div class="wiz-check"></div></button>
     <button class="wiz-option" style="align-items:flex-start" onclick="pick(this,'modell','kombination')"><div class="wiz-option-icon"><i data-lucide="shuffle" class="lu"></i></div><div style="flex:1"><div class="wiz-option-label">Kombination</div><div class="wiz-option-sub">Mehrere Tarifmodelle parallel, z. B. Budget für alle plus Erstattungsbausteine für Führungskräfte.</div><div class="wiz-option-expl">Für den Kunden: Maximale Passgenauigkeit für unterschiedliche Mitarbeitergruppen, dafür etwas mehr Erklärungsaufwand in der Kommunikation – dabei unterstützen wir Sie.</div></div><div class="wiz-check"></div></button>
   </div>
-  <div class="kh">
   <hr class="hr">
   <p class="sl">Wie viel möchten Sie ausgeben?</p>
   <div class="field">
@@ -299,15 +322,16 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       <input type="number" id="budinput" min="5" max="200" step="1" value="50" oninput="updBudFromInput(this.value)" style="font-size:18px;font-weight:600;color:var(--brand);text-align:right">
       <span style="font-size:14px;color:var(--ink-muted);white-space:nowrap">€ / Monat</span>
     </div>
-    <div class="ssub" id="budsub" style="margin-top:6px">Wie viel Jahresbudget das für Ihre Mitarbeitenden ergibt, hängt vom Versicherer ab – manche Tarife wandeln denselben Beitrag in ein deutlich höheres Budget um als andere.</div>
   </div>
-  <div class="bm" style="grid-template-columns:1fr 1fr">
-    <div><div class="bmv" id="bmtot">–</div><div class="bml">Jahresbeitrag gesamt</div></div>
-    <div><div class="bmv" id="bmmav">–</div><div class="bml">Versicherte MA</div></div>
+  <div class="kh">
+    <div class="ssub" id="budsub"></div>
+    <div class="bm" style="grid-template-columns:1fr 1fr">
+      <div><div class="bmv" id="bmtot">–</div><div class="bml">Jahresbeitrag gesamt</div></div>
+      <div><div class="bmv" id="bmmav">–</div><div class="bml">Versicherte MA</div></div>
+    </div>
+    <div id="budgetPreview"></div>
   </div>
-  <div id="budgetPreview"></div>
   <div id="taxstat"></div>
-  </div>
   <hr class="hr">
   <div class="g2">
     <div class="field"><label class="l">Wunsch-Starttermin</label>
@@ -378,7 +402,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   <p class="wiz-sub">Eine bKV scheitert selten am Produkt – sie scheitert an der Einführung. Ohne aktive Begleitung verpufft der Benefit still und leise: Nur 45 % der Mitarbeitenden nutzen angebotene Benefits regelmäßig, obwohl 86 % einen Anspruch darauf hätten. Wählen Sie, welche Leistungen wir für dieses Unternehmen übernehmen sollen.</p>
   <div class="svc-grid" id="svcgrid"></div>
   <div class="ib brand"><i data-lucide="shield-check" class="lu"></i><span>Diese Leistungen sind unabhängig vom gewählten Versicherer – sie sind unser Beitrag als Partner, damit die bKV beim Kunden wirklich ankommt.</span></div>
-  <div class="wiz-nav"><button class="wiz-btn wiz-btn-ghost" onclick="prev()"><i data-lucide="arrow-left" class="lu"></i> Zurück</button><button class="wiz-btn wiz-btn-primary" style="background:var(--brand-dark)" onclick="next()"><i data-lucide="search" class="lu"></i> Auswertung starten</button></div>
+  <div class="wiz-nav"><button class="wiz-btn wiz-btn-ghost" onclick="prev()"><i data-lucide="arrow-left" class="lu"></i> Zurück</button><button class="wiz-btn wiz-btn-primary" style="background:var(--brand-dark)" onclick="next()"><i data-lucide="file-check" class="lu"></i> Zusammenfassung generieren</button></div>
 </div>
 
 <!-- S9 Ergebnis -->
@@ -393,6 +417,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     <span id="pdfHeaderName"></span>
   </div>
   <div id="s9thanks"></div>
+  <div id="s9protocol"></div>
   <div id="s7c" class="kh"></div>
   <div class="wiz-nav" style="margin-top:20px">
     <button class="wiz-btn wiz-btn-ghost" onclick="prev()"><i data-lucide="arrow-left" class="lu"></i> Zurück</button>
@@ -404,7 +429,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 
 <script>
 const TOTAL_STEPS=9;
-const PW=[0,1,2,4];
+const PW=[0,1,2,3,4,5];
 // Faktenbasiertes Datenmodell (Quelle: bKV-Anbieter-Masterdatenbank.md, konsolidiert aus zwei Deep-Research-Berichten 2026).
 // leistungen[kat] = {status:'ja'|'teilweise'|'nein'|'unbelegt', detail:'Originalformulierung aus der Masterdatenbank'}.
 // 'ja' nur wenn die Quelle eine volle/100%-Abdeckung explizit nennt, 'teilweise' bei Prozentsatz/Limit/separatem Baustein,
@@ -414,25 +439,25 @@ const PW=[0,1,2,4];
 const PROV=[
  {id:'allianz',n:'Allianz',a:'ALZ',c:'#003781',mA:5,mBmin:300,mB:1500,mo:['budget','erstattung','kombination'],
   beitrag:13.90,beitragBudget:300,beitragKonf:'hoch',
-  leistungen:{z:{status:'ja',detail:'90–100 % Zahnersatz, 100 % PZR'},b:{status:'teilweise',detail:'Sehhilfen 75–100 % bis 350 €/Jahr (Euro-Limit)'},v:{status:'ja',detail:'100 % Vorsorge inkl. Impfungen'},h:{status:'teilweise',detail:'Heilpraktiker im ambulanten Budget, kein Prozentsatz dokumentiert'},k:{status:'ja',detail:'Chefarzt/Einzelzimmer 100 %, Tagegeld 10 €/Tag bis 28 Tage'},au:{status:'unbelegt',detail:null},p:{status:'teilweise',detail:'Psychotherapie nach GOÄ, kein Prozentsatz dokumentiert'}},
+  leistungen:{z:{status:'ja',detail:'90–100 % Zahnersatz, 100 % PZR'},b:{status:'teilweise',detail:'Sehhilfen 75–100 % bis 350 €/Jahr (Euro-Limit)'},v:{status:'ja',detail:'100 % Vorsorge inkl. Impfungen'},h:{status:'teilweise',detail:'Heilpraktiker im ambulanten Budget, kein Prozentsatz dokumentiert'},k:{status:'ja',detail:'Chefarzt/Einzelzimmer 100 %, Tagegeld 10 €/Tag bis 28 Tage'},au:{status:'unbelegt',detail:null},p:{status:'unbelegt',detail:null}},
   portabilitaet:'ja',wartezeit:'keine',
   stabilitaet:{status:'unbelegt',text:'Vielfach kolportierte Beitragsgarantie 2026 – keine Allianz-Primärquelle mit Datum gefunden'},
   tag:'Umfangreicher Leistungsumfang',hl:'Sehr breiter Leistungsumfang laut Produktunterlagen, mehrfach ausgezeichnet (IVFP, Focus Money).',w:null},
  {id:'axa',n:'AXA',a:'AXA',c:'#00008F',mA:5,mBmin:300,mB:1500,mo:['budget','erstattung','kombination'],
   beitrag:13.59,beitragBudget:300,beitragKonf:'mittel',
-  leistungen:{z:{status:'ja',detail:'bis 100 % Regelversorgung, 100 % PZR'},b:{status:'teilweise',detail:'Sehhilfen bis 450 € (Premium) bzw. 300 €'},v:{status:'teilweise',detail:'Kurse, Impfungen'},h:{status:'ja',detail:'Osteopathie, Heilpraktiker im Budget'},k:{status:'teilweise',detail:'10 €/Tag bis 28 Tage; bei FlexMed Privat 100 %'},au:{status:'unbelegt',detail:null},p:{status:'ja',detail:'100 % in easy Premium'}},
+  leistungen:{z:{status:'ja',detail:'bis 100 % Regelversorgung, 100 % PZR'},b:{status:'teilweise',detail:'Sehhilfen bis 450 € (Premium) bzw. 300 €'},v:{status:'teilweise',detail:'Kurse, Impfungen'},h:{status:'ja',detail:'Osteopathie, Heilpraktiker im Budget'},k:{status:'teilweise',detail:'10 €/Tag bis 28 Tage; bei FlexMed Privat 100 %'},au:{status:'unbelegt',detail:null},p:{status:'unbelegt',detail:null}},
   portabilitaet:'ja',wartezeit:'keine',
   stabilitaet:{status:'unbelegt',text:'Kommunizierte Beitragsgarantie bis 01.01.2027 – Datum nicht an Primärquelle verifiziert'},
-  tag:'Psychotherapie & niedriger Einstieg',hl:'Guter Leistungsumfang laut Produktunterlagen, niedriger Einstiegsbeitrag, Psychotherapie zu 100 % in easy Premium.',w:null},
+  tag:'Niedriger Einstieg',hl:'Guter Leistungsumfang laut Produktunterlagen, niedriger Einstiegsbeitrag.',w:null},
  {id:'barmenia',n:'Barmenia / BarmeniaGothaer',a:'BAR',c:'#009FE3',mA:5,mBmin:300,mB:750,mo:['budget','erstattung'],
   beitrag:9.90,beitragBudget:300,beitragKonf:'mittel',
-  leistungen:{z:{status:'ja',detail:'100 % Zahnersatz/-behandlung, PZR bis 80 €/Jahr'},b:{status:'ja',detail:'100 % Sehhilfe/Refraktion'},v:{status:'teilweise',detail:'100 % Vorsorge bis 500 €/2 Jahre (MediGroup-Baustein)'},h:{status:'unbelegt',detail:null},k:{status:'teilweise',detail:'10 €/Tag Tagegeld; Chefarzt/Einzelzimmer nur als MediGroup-Baustein'},au:{status:'unbelegt',detail:null},p:{status:'teilweise',detail:'Psychotherapie nach GOÄ (Quelle 1)'}},
+  leistungen:{z:{status:'ja',detail:'100 % Zahnersatz/-behandlung, PZR bis 80 €/Jahr'},b:{status:'ja',detail:'100 % Sehhilfe/Refraktion'},v:{status:'teilweise',detail:'100 % Vorsorge bis 500 €/2 Jahre (MediGroup-Baustein)'},h:{status:'unbelegt',detail:null},k:{status:'teilweise',detail:'10 €/Tag Tagegeld; Chefarzt/Einzelzimmer nur als MediGroup-Baustein'},au:{status:'unbelegt',detail:null},p:{status:'unbelegt',detail:null}},
   portabilitaet:'ja',wartezeit:'keine',
   stabilitaet:{status:'unbelegt',text:'Keine dokumentierten Beitragsereignisse für Barmenia-eigene Linie gefunden (siehe separat Gothaer-Fusion)'},
   tag:'Günstigster Einstieg im Vergleich',hl:'Laut Masterdatenbank günstigster identifizierter Einstiegstarif (9,90 €), starkes Zahn-/Präventionsangebot.',w:null},
  {id:'gothaer',n:'Gothaer (FlexSelect)',a:'GOT',c:'#C0392B',mA:5,mBmin:300,mB:750,mo:['budget'],
   beitrag:9.90,beitragBudget:300,beitragKonf:'mittel',
-  leistungen:{z:{status:'ja',detail:'100 % Zahnersatz und -behandlung, PZR 80 €/Jahr'},b:{status:'ja',detail:'100 % Sehhilfe/Refraktion'},v:{status:'teilweise',detail:'100 % Vorsorge bis 500 €/2 Jahre (MediGroup-Baustein)'},h:{status:'unbelegt',detail:null},k:{status:'teilweise',detail:'10 €/Tag Tagegeld; Chefarzt/Einzelzimmer nur als MediGroup-Baustein'},au:{status:'unbelegt',detail:null},p:{status:'teilweise',detail:'Psychotherapie nach GOÄ (Quelle 1)'}},
+  leistungen:{z:{status:'ja',detail:'100 % Zahnersatz und -behandlung, PZR 80 €/Jahr'},b:{status:'ja',detail:'100 % Sehhilfe/Refraktion'},v:{status:'teilweise',detail:'100 % Vorsorge bis 500 €/2 Jahre (MediGroup-Baustein)'},h:{status:'unbelegt',detail:null},k:{status:'teilweise',detail:'10 €/Tag Tagegeld; Chefarzt/Einzelzimmer nur als MediGroup-Baustein'},au:{status:'unbelegt',detail:null},p:{status:'unbelegt',detail:null}},
   portabilitaet:'ja',wartezeit:'keine',
   stabilitaet:{status:'erhoeht',text:'Angekündigte Beitragserhöhung bis zu 50 % für Bestandskunden zum 01.01.2026 (Vertriebsinformation BarmeniaGothaer)'},
   tag:'Beitragserhöhung angekündigt',hl:'Günstiger Einstieg, aber für 2026 ist eine Beitragserhöhung von bis zu 50 % dokumentiert – vor Neuabschluss prüfen.',w:'Für 2026 ist eine Beitragserhöhung von bis zu 50 % für Bestandskunden angekündigt.'},
@@ -450,7 +475,7 @@ const PROV=[
   tag:'Breite Optionsvielfalt',hl:'Günstiger Einstiegsbaustein, drei wählbare Krankenhausvarianten, aber komplexere Tarifstruktur.',w:null},
  {id:'dkv',n:'DKV (ERGO)',a:'DKV',c:'#005487',mA:10,mBmin:300,mB:1200,mo:['budget','erstattung'],
   beitrag:14,beitragBudget:300,beitragKonf:'niedrig',
-  leistungen:{z:{status:'ja',detail:'Reinigung, Füllung, Zahnersatz; Kompakttarife ergänzen Inlays/Implantate'},b:{status:'teilweise',detail:'Ambulanter Zusatz Brille/Sehhilfe'},v:{status:'unbelegt',detail:null},h:{status:'ja',detail:'Heilpraktiker im ambulanten Budget'},k:{status:'teilweise',detail:'Einzelzimmer, Tagegeld (nur Kompakttarife)'},au:{status:'unbelegt',detail:null},p:{status:'teilweise',detail:'Reha-/Psychotherapie-Optionen je nach Paket'}},
+  leistungen:{z:{status:'ja',detail:'Reinigung, Füllung, Zahnersatz; Kompakttarife ergänzen Inlays/Implantate'},b:{status:'teilweise',detail:'Ambulanter Zusatz Brille/Sehhilfe'},v:{status:'unbelegt',detail:null},h:{status:'ja',detail:'Heilpraktiker im ambulanten Budget'},k:{status:'teilweise',detail:'Einzelzimmer, Tagegeld (nur Kompakttarife)'},au:{status:'unbelegt',detail:null},p:{status:'unbelegt',detail:null}},
   portabilitaet:'unbelegt',wartezeit:'keine',
   stabilitaet:{status:'unbelegt',text:'Keine offiziell veröffentlichten Beitragstabellen oder -ereignisse gefunden'},
   tag:'IVFP-Testnote exzellent',hl:'IVFP-Testnote "exzellent", Budgets können sich laut Anbieter bei Leistungsfreiheit erhöhen.',w:null},
@@ -504,7 +529,7 @@ const PROV=[
   tag:'Fokus Großunternehmen',hl:'Sehr hoher dokumentierter Leistungsumfang, aber Fokus auf Unternehmen ab 25 MA und wenig öffentliche Preistransparenz.',w:null},
  {id:'devk',n:'DEVK',a:'DEVK',c:'#00549F',mA:5,mBmin:400,mB:900,mo:['budget'],
   beitrag:18.40,beitragBudget:400,beitragKonf:'mittel',
-  leistungen:{z:{status:'teilweise',detail:'Basis 70–90 %, PZR 75–100 €/Jahr'},b:{status:'teilweise',detail:'Sehhilfen 75–100 %'},v:{status:'teilweise',detail:'ca. 400 € Präventionsbudget'},h:{status:'ja',detail:'100 % Heilpraktiker/Naturheilverfahren'},k:{status:'ja',detail:'Hospital Basis (2-Bett) oder Komfort (1-Bett, Chefarzt)'},au:{status:'unbelegt',detail:null},p:{status:'teilweise',detail:'Psychologische Kurzintervention bis 500 € (Assistance-Leistung)'}},
+  leistungen:{z:{status:'teilweise',detail:'Basis 70–90 %, PZR 75–100 €/Jahr'},b:{status:'teilweise',detail:'Sehhilfen 75–100 %'},v:{status:'teilweise',detail:'ca. 400 € Präventionsbudget'},h:{status:'ja',detail:'100 % Heilpraktiker/Naturheilverfahren'},k:{status:'ja',detail:'Hospital Basis (2-Bett) oder Komfort (1-Bett, Chefarzt)'},au:{status:'unbelegt',detail:null},p:{status:'unbelegt',detail:null}},
   portabilitaet:'ja',wartezeit:'keine',
   stabilitaet:{status:'unbelegt',text:'Keine dokumentierten Beitragsereignisse gefunden'},
   tag:'Umfangreiche Assistance',hl:'Digital gut aufgestellt, umfangreiche Assistance-Leistungen (Zweitmeinung, psychologische Kurzintervention).',w:null},
@@ -528,7 +553,7 @@ const LEIST=[
  {id:'h',icon:'leaf',n:'Heilpraktiker',d:'Alternative Medizin, Osteopathie'},
  {id:'k',icon:'building-2',n:'Krankenhaus',d:'Chefarzt, Einbettzimmer'},
  {id:'au',icon:'plane',n:'Auslandskrankenschutz',d:'Weltweiter Schutz, Rückholung'},
- {id:'p',icon:'brain',n:'Psychotherapie',d:'Psycholog. Beratung, Coaching'}
+ {id:'p',icon:'activity',n:'Physiotherapie',d:'Krankengymnastik, Massagen, Bewegungstherapie'}
 ];
 const MBSVC=[
  {id:'vso',icon:'scale',n:'Versorgungsordnung',d:'Wir beauftragen und bezahlen den Rechtsanwalt für die rechtssichere Versorgungsordnung. Kein Extraaufwand für den Kunden – das ist unser Job.',ind:'Sinnvoll für jedes Unternehmen ohne bestehende Versorgungsordnung, insbesondere ab ca. 10 Mitarbeitenden.'},
@@ -542,7 +567,7 @@ const MBSVC=[
  {id:'checkin',icon:'calendar-check-2',n:'Regelmäßige Strategie-Check-ins',d:'Feste Termine, bei denen wir gemeinsam Nutzung, Zufriedenheit und mögliche Anpassungen besprechen.',ind:'Empfehlenswert für Unternehmen, die die bKV aktiv als strategisches Instrument der Mitarbeiterbindung nutzen wollen.'}
 ];
 let cur=1;
-const S={fn:'',br:'',asp:'',pos:'',ent:'GF+HR',gdat:'',maG:0,maV:0,alts:'gemischt',beruf:'',sb:0,modell:'budget',budget:600,beitragMonatlich:50,start:'',vrunde:'neu',prio:{z:2,b:2,v:2,h:1,k:1,au:1,p:1},prioStab:2,vq:{beitrag:'egal',pflege:'egal',aufstock:'egal',familie:'egal',mitnahme:'egal'},vorh:'nein',exAnb:'',exTar:'',exBei:'',noti:'',mbsvc:['vso','null','anleit'],contacts:[{name:'',position:'',tel:'',email:''}]};
+const S={fn:'',br:'',asp:'',pos:'',ent:'GF+HR',gdat:'',maG:0,maV:0,alts:'gemischt',beruf:'',sb:0,modell:'budget',budget:600,beitragMonatlich:50,start:'',vrunde:'neu',prio:{z:2,b:2,v:2,h:1,k:1,au:1,p:1},prioStab:2,vq:{beitrag:'nein',pflege:'nein',aufstock:'nein',familie:'nein',mitnahme:'nein'},vorh:'nein',exAnb:'',exTar:'',exBei:'',noti:'',mbsvc:[],contacts:[{name:'',position:'',tel:'',email:''}]};
 function lucideRefresh(){ if(window.lucide) lucide.createIcons(); }
 function showStep(n){
   for(let i=1;i<=TOTAL_STEPS;i++){
@@ -557,7 +582,7 @@ function showStep(n){
   if(n===6)renderVQ();
   if(n===7){syncMainContact();renderContacts();}
   if(n===8)renderSvc();
-  if(n===9){renderThanks();renderRes();}
+  if(n===9){renderThanks();renderProtocolSummary();renderRes();}
   lucideRefresh();
 }
 function save(){
@@ -578,8 +603,8 @@ function syncMA(){
 function setVQ(key,val){S.vq[key]=val;renderVQ()}
 function renderVQ(){
   const map={beitrag:'vq-beitrag',pflege:'vq-pflege',aufstock:'vq-aufstock',familie:'vq-familie',mitnahme:'vq-mitnahme'};
-  const order=['nein','egal','ja'];
-  const lbl={nein:'Nein',egal:'Egal',ja:'Ja'};
+  const order=['nein','ja'];
+  const lbl={nein:'Eher nicht wichtig',ja:'Wichtig'};
   Object.keys(map).forEach(k=>{
     const el=document.getElementById(map[k]);
     if(!el)return;
@@ -678,13 +703,20 @@ function renderTax(){
   document.getElementById('taxstat').innerHTML=h;
   lucideRefresh();
 }
-const PLBLS=['Nicht wichtig','Egal','Wichtig','Muss enthalten sein'];
+const PLBLS=['Gar nicht wichtig','1/5','2/5','3/5','4/5','5/5 · Muss enthalten sein'];
+// Sterne-Widget: Index 0 = "X" (gar nicht wichtig, kein Stern gefüllt), Index 1-5 = gefüllte Sterne.
+// onClickExpr ist ein fertiger onclick-Ausdruck, z.B. "setPrio('z',VAL)" - VAL wird durch den Klickwert ersetzt.
+function starWidget(current,onClickExpr){
+  const xBtn=`<button class="star-x${current===0?' active':''}" title="Gar nicht wichtig" onclick="${onClickExpr.replace('VAL','0')}"><i data-lucide="x" class="lu"></i></button>`;
+  const stars=[1,2,3,4,5].map(i=>`<button class="star-btn${i<=current?' filled':''}" title="${i}/5" onclick="${onClickExpr.replace('VAL',i)}"><i data-lucide="star" class="lu"></i></button>`).join('');
+  return `<div class="star-row">${xBtn}${stars}</div>`;
+}
 function renderPrio(){
   document.getElementById('priogrid').innerHTML=LEIST.map(l=>`
   <div class="pcard"><div class="ptop"><div class="pico"><i data-lucide="${l.icon}" class="lu"></i></div><div><div class="pname">${l.n}</div><div class="pdsc">${l.d}</div></div></div>
-  <div class="pbrow">${PLBLS.map((lbl,i)=>`<button class="pb${S.prio[l.id]===i?' s'+i:''}" onclick="setPrio('${l.id}',${i})">${lbl}</button>`).join('')}</div></div>`).join('');
+  ${starWidget(S.prio[l.id],`setPrio('${l.id}',VAL)`)}</div>`).join('');
   const sr=document.getElementById('stabrow');
-  if(sr)sr.innerHTML=PLBLS.map((lbl,i)=>`<button class="pb${S.prioStab===i?' s'+i:''}" onclick="setPrioStab(${i})">${lbl}</button>`).join('');
+  if(sr)sr.innerHTML=starWidget(S.prioStab,'setPrioStab(VAL)');
   lucideRefresh();
 }
 function setPrio(id,v){S.prio[id]=v;renderPrio()}
@@ -753,15 +785,39 @@ function covDot(status){
 }
 // Zeigt einen Dankestext plus Anbieter-Übersicht statt der detaillierten Auswertung.
 // Der eigentliche Vergleich (renderRes) läuft weiterhin im Hintergrund für den Google-Sheets-Export.
+// Partner-Logos für die Dankesseite - bewusst NICHT Teil von #s9protocol/renderProtocolSummary,
+// damit sie nur auf dem Bildschirm erscheinen und nicht mit ins PDF gedruckt werden.
+const PARTNER_LOGOS=[
+ {n:'Barmenia',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/69b910495f0c070929035fd3_Barmenia%20Logo%20-%20200x100px.svg'},
+ {n:'Hallesche',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/69b90fc36b5569307c9f4f9c_Hallesche%20Logo%20-%20200x100px.svg'},
+ {n:'Debeka',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/69b90f46027978984ca6444b_Debeka%20Logo%20-%20200x100px.svg'},
+ {n:'Signal Iduna',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/69b90f45ecab24d7f1e32f17_Signal%20Iduna%20Logo%20-%20200x100px.svg'},
+ {n:'Allianz',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/69b90e03bd2ee1f928509d6b_a4ad2b9c7528e5142bd226d674225c13_Allianz%20Logo%20-%20200x100px.svg'},
+ {n:'Nürnberger',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/6a4bff7fe84abbd1006a240c_Nu%CC%88rnburger%20Logo%20-%20200x100px.png'},
+ {n:'ARAG',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/6a4bff7f3607bb1c43ccc40d_ARAG%20Logo%20-%20200x100px.png'},
+ {n:'Continentale',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/6a4bff7f0949cff25378c699_Continentale%20Logo%20-%20200x100px.png'},
+ {n:'Münchner Verein',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/6a4bff7fdcfef649875adca0_Mu%CC%88nchner%20Verein%20Logo%20-%20200x100px.png'},
+ {n:'Universa',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/6a4bff7f4f9426cadebcdb08_Universa%20Logo%20-%20200x100px.png'},
+ {n:'SDK',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/6a4bff7f32038776ebf6f1d0_SDK%20Logo%20-%20200x100px.png'},
+ {n:'DVK',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/6a4bff80f725b98139b1ee53_DVK%20Logo%20-%20200x100px.png'},
+ {n:'AXA',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/6a4bff80f78872a7e477f7db_AXA%20Logo%20-%20200x100px.png'},
+ {n:'HanseMerkur',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/6a4bff80e2c1fde060d5ecbc_HanseMerkur%20Logo%20-%20200x100px.png'},
+ {n:'R+V',src:'https://cdn.prod.website-files.com/64c52e42ef257386b3db09b3/6a4bff80f78872a7e477f7e5_R%2BV%20Logo%20-%20200x100px.png'}
+];
 function renderThanks(){
   const custName=S.fn||'Ihr Unternehmen';
   document.getElementById('pdfTitleName').textContent=custName;
   document.getElementById('pdfHeaderName').textContent='& '+custName;
+  const logos=PARTNER_LOGOS.map(l=>`<img src="${l.src}" alt="${esc(l.n)}" title="${esc(l.n)}" class="partner-logo">`).join('');
   document.getElementById('s9thanks').innerHTML=`
     <div class="wiz-rec" style="text-align:center;padding:32px 24px">
       <i data-lucide="check-circle-2" class="lu" style="width:40px;height:40px;color:var(--brand);margin-bottom:14px"></i>
       <div style="font-size:19px;font-weight:600;color:var(--ink);margin-bottom:10px">Vielen Dank für Ihr Vertrauen und Ihre Eingaben.</div>
       <div style="font-size:14px;color:var(--ink-mid);max-width:480px;margin:0 auto">Unser Team wird Ihre Anforderungen auswerten und mit den besten Tarifen wieder auf Sie zukommen.</div>
+    </div>
+    <div class="partner-logos-section">
+      <div class="partner-logos-title">Unser Team prüft jetzt</div>
+      <div class="partner-logos-grid">${logos}</div>
     </div>`;
   lucideRefresh();
 }
@@ -886,9 +942,85 @@ function renderRes(){
 // Trägt sich selbst als "einmal pro Auswertung" ein, damit erneutes Rendern (z.B. durch
 // Zurück-/Vor-Navigation) nicht wiederholt Zeilen im Sheet anlegt.
 let lastSentSnapshot=null;
-const GSHEET_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbz4RuoeGcG3jiqOvKVoQm6wV5IJo05rTwi3oHngaSc8HWaj1AO8wsgKd5_41X2kbbJ5HQ/exec';
+const GSHEET_WEBHOOK_URL='https://script.google.com/macros/s/AKfycbzg_gu-9UOMEJO86Dnjn0DwtalblL2-g2g7tJRdXU6fa4kqFFumQGFtQFJW4YSltccjMQ/exec';
 const VQL_FULL={beitrag:'Beitragsbefreiung gewünscht',pflege:'Pflegeoption gewünscht',aufstock:'Aufstockung durch MA gewünscht',familie:'Familienversicherung gewünscht',mitnahme:'Mitnahme bei Ausscheiden gewünscht'};
 const ENT_LBL={HR:'HR-Leitung',['GF+HR']:'HR + GF gemeinsam',GF:'Geschäftsführung',unklar:'Noch unklar'};
+// Reine Eingaben-Zusammenfassung fürs PDF – bewusst OHNE Anbieter-Scoring/Empfehlung,
+// da die Auswertung selbst dem Kunden nicht mehr angezeigt wird (nur intern/Sheets-Export).
+// Baut eine saubere Zeile-für-Zeile-Sektion (Label: Wert) statt einer Pill-Wolke -
+// besser lesbar auf Bildschirm und im PDF-Ausdruck.
+function protoSection(title,icon,rows){
+  const visibleRows=rows.filter(r=>r&&r[1]!=null&&r[1]!=='');
+  if(!visibleRows.length)return'';
+  return `<div class="proto-section">
+    <div class="proto-section-title"><i data-lucide="${icon}" class="lu"></i>${esc(title)}</div>
+    ${visibleRows.map(([label,value])=>`<div class="proto-row"><span class="proto-label">${esc(label)}</span><span class="proto-value">${value}</span></div>`).join('')}
+  </div>`;
+}
+function renderProtocolSummary(){
+  const MODL={budget:'Budgettarif',erstattung:'Bausteintarif',kombination:'Kombi-Tarif'};
+  const ALTS_LBL={gemischt:'Gemischt (Ø 33–48)',jung:'Überwiegend jung (Ø < 33)',erfahren:'Überwiegend erfahren (Ø > 48)'};
+  const VRUNDE_LBL={neu:'Neuabschluss',wechsel:'Anbieterwechsel',erweiterung:'Erweiterung bestehend'};
+  const fmtM=m=>{try{return new Date(m).toLocaleString('de-DE',{day:'2-digit',month:'long',year:'numeric'})}catch{return m}};
+  const prioList=[...LEIST].sort((a,b)=>(S.prio[b.id]||0)-(S.prio[a.id]||0));
+  const contacts=S.contacts.filter(c=>c.name||c.tel||c.email);
+
+  let h=`<div class="wiz-rec"><div class="wiz-rec-label"><i data-lucide="clipboard" class="lu"></i>Zusammenfassung der Eingaben</div>
+    <div class="wiz-rec-title">${esc(S.fn||'Unbekanntes Unternehmen')}</div>
+  </div>`;
+
+  h+=protoSection('Unternehmen','building-2',[
+    ['Firmenname',esc(S.fn)],
+    ['Branche',esc(S.br)],
+    ['Entscheidungsträger',esc(ENT_LBL[S.ent]||S.ent)],
+    ['Gesprächsdatum',S.gdat?fmtM(S.gdat):''],
+  ]);
+  h+=protoSection('Mitarbeiterstruktur','users',[
+    ['Mitarbeiter gesamt',S.maG],
+    ['Davon versicherbar (GKV)',S.maV],
+    ['Durchschnittsalter',esc(ALTS_LBL[S.alts]||S.alts)],
+    ['Berufsgruppe',esc(S.beruf)],
+  ]);
+  h+=protoSection('Sachbezüge','wallet',[
+    ['Bereits genutzte Sachbezüge',S.sb?eu(S.sb)+' € / Monat':''],
+  ]);
+  h+=protoSection('Budget & Modell','coins',[
+    ['Tarifmodell',esc(MODL[S.modell]||ucf(S.modell))],
+    ['AG-Beitrag pro Mitarbeiter',eu(S.beitragMonatlich)+' € / Monat'],
+    ['Wunsch-Starttermin',S.start?fmtM(S.start):''],
+    ['Vertragsrunde',esc(VRUNDE_LBL[S.vrunde]||S.vrunde)],
+  ]);
+  h+=protoSection('Leistungspriorisierung','list-checks',
+    prioList.map(l=>[l.n,PLBLS[S.prio[l.id]||0]]).concat([['Beitragsstabilität',PLBLS[S.prioStab||0]]])
+  );
+  h+=protoSection('Vertragsdetails','file-text',
+    Object.keys(VQL_FULL).map(k=>[VQL_FULL[k],S.vq[k]==='ja'?'Wichtig':'Eher nicht wichtig'])
+  );
+  h+=protoSection('Wettbewerb','scale',[
+    ['Bestehendes Angebot',S.vorh==='ja'?'Ja':'Nein'],
+    ['Bestehender Anbieter',esc(S.exAnb)],
+    ['Bestehender Tarif',esc(S.exTar)],
+    ['Bestehender Monatsbeitrag',S.exBei?eu(S.exBei)+' €':''],
+  ]);
+  if(S.mbsvc.length){
+    h+=protoSection('Gewünschte MB24-Leistungen','shield-check',
+      S.mbsvc.map(id=>{const sv=MBSVC.find(x=>x.id===id);return sv?[sv.n,'Gewünscht']:null}).filter(Boolean)
+    );
+  }
+  if(contacts.length){
+    h+=protoSection('Ansprechpartner','contact',
+      contacts.map((c,i)=>[
+        (i===0?'Hauptansprechpartner':'Weitere(r) Ansprechpartner'),
+        [esc(c.name||'–'),c.position?esc(c.position):'',c.tel?esc(c.tel):'',c.email?esc(c.email):''].filter(Boolean).join(' · ')
+      ])
+    );
+  }
+  if(S.noti){
+    h+=`<div class="proto-section"><div class="proto-section-title"><i data-lucide="sticky-note" class="lu"></i>Notizen zum Gespräch</div><div class="proto-notes">${esc(S.noti)}</div></div>`;
+  }
+  document.getElementById('s9protocol').innerHTML=h;
+  lucideRefresh();
+}
 // Vollständiges Beratungsprotokoll: jede Eingabe des Kunden wird als eigene Spalte übertragen,
 // nicht nur das Scoring-Ergebnis. Reihenfolge folgt dem Wizard-Ablauf (Schritt 1 -> 8).
 function sendToSheet(elig){
@@ -899,7 +1031,7 @@ function sendToSheet(elig){
   const ALTS_LBL={gemischt:'Gemischt (Ø 33–48)',jung:'Überwiegend jung (Ø < 33)',erfahren:'Überwiegend erfahren (Ø > 48)'};
   const prioText=LEIST.map(l=>`${l.n}: ${PLBLS[S.prio[l.id]||0]}`).join(' | ');
   const stabText=S.prioStab!=null?PLBLS[S.prioStab]:'';
-  const vqText=Object.keys(VQL_FULL).map(k=>`${VQL_FULL[k]}: ${S.vq[k]==='ja'?'Ja':S.vq[k]==='nein'?'Nein':'Egal'}`).join(' | ');
+  const vqText=Object.keys(VQL_FULL).map(k=>`${VQL_FULL[k]}: ${S.vq[k]==='ja'?'Wichtig':'Eher nicht wichtig'}`).join(' | ');
   const mbsvcText=S.mbsvc.map(id=>MBSVC.find(s=>s.id===id)?.n||id).join(', ');
   const otherContactsText=otherContacts.map(c=>`${c.name} (${c.position||'ohne Position'}, ${c.tel||'ohne Telefon'}, ${c.email||'ohne E-Mail'})`).join(' / ');
   const payload={
@@ -910,7 +1042,7 @@ function sendToSheet(elig){
     // Schritt 3 – Sachbezüge
     sachbezuegeGenutzt:S.sb,
     // Schritt 4 – Budget & Modell
-    tarifmodell:MODL[S.modell]||S.modell,agBeitragProMonat:S.beitragMonatlich,jahresbudgetMedianSchaetzung:S.budget,wunschStart:S.start,vertragsrunde:S.vrunde,
+    tarifmodell:MODL[S.modell]||S.modell,agBeitragProMonat:S.beitragMonatlich,wunschStart:S.start,vertragsrunde:S.vrunde,
     // Schritt 5 – Leistungspriorisierung
     leistungspriorisierung:prioText,beitragsstabilitaetPrioritaet:stabText,
     // Schritt 6 – Vertragsdetails
