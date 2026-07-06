@@ -18,8 +18,9 @@ body{background:var(--surface);overflow:hidden;font-weight:300}
 .wiz-header span{font-size:13px;font-weight:500;color:var(--ink-mid)}
 .wiz-progress{display:flex;align-items:center;gap:8px;margin-bottom:32px}
 .wiz-step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;background:var(--border);color:var(--ink-muted);transition:all .3s;flex-shrink:0}
-.wiz-step-dot.active{background:var(--brand);color:#fff;box-shadow:0 0 0 4px var(--brand-light)}
-.wiz-step-dot.done{background:var(--brand);color:#fff}
+.wiz-step-dot.active{background:var(--brand);color:#fff;box-shadow:0 0 0 4px var(--brand-light);cursor:pointer}
+.wiz-step-dot.done{background:var(--brand);color:#fff;cursor:pointer}
+.wiz-step-dot.done:hover{box-shadow:0 0 0 4px var(--brand-light)}
 .wiz-step-dot.done span{display:none}
 .wiz-step-dot.done .lu{display:block;width:13px;height:13px;stroke-width:3}
 .wiz-step-dot .lu{display:none}
@@ -61,9 +62,9 @@ body{background:var(--surface);overflow:hidden;font-weight:300}
 .proto-row{display:flex;justify-content:space-between;gap:16px;padding:6px 0;font-size:13px;border-top:1px solid var(--border)}
 .proto-row:first-of-type{border-top:none}
 .proto-label{color:var(--ink-muted);flex-shrink:0}
-.proto-value{color:var(--ink);font-weight:500;text-align:right}
+.proto-value{color:var(--ink-mid);font-weight:400;text-align:right}
 .proto-notes{font-size:12.5px;color:var(--ink-mid);line-height:1.55}
-.partner-logos-section{margin-top:22px;text-align:center}
+.partner-logos-section{margin-top:22px;margin-bottom:36px;text-align:center}
 .partner-logos-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-muted);margin-bottom:16px}
 .partner-logos-grid{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:24px 32px;padding:0 12px}
 .partner-logo{height:32px;width:auto;max-width:110px;object-fit:contain;filter:grayscale(1);opacity:.65;transition:filter .15s,opacity .15s}
@@ -98,6 +99,9 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 .stk{position:relative;height:14px;font-size:11px;color:var(--ink-muted);margin-top:4px}
 .stk span{position:absolute;transform:translateX(-50%);white-space:nowrap}
 .pcard{background:var(--brand-xlight);border:1.5px solid var(--border);border-radius:10px;padding:13px;margin-bottom:9px}
+.prio-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.prio-grid .pcard{margin-bottom:0}
+@media(max-width:640px){.prio-grid{grid-template-columns:1fr}}
 .ptop{display:flex;align-items:center;gap:9px;margin-bottom:9px}
 .pico{width:32px;height:32px;background:var(--brand-light);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--brand)}
 .pico .lu{width:16px;height:16px}
@@ -185,7 +189,9 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   .pdf-header{display:flex;align-items:center;gap:10px;position:fixed;top:0;left:0;right:0;padding:0 40px 14px;border-bottom:1px solid var(--border);background:#fff;z-index:1}
   .pdf-header img{height:22px;width:auto}
   .pdf-header span{font-size:12.5px;font-weight:500;color:var(--ink-mid)}
-  #s7c,#s9protocol{margin-top:26mm}
+  #s7c{margin-top:26mm}
+  #s9thanks{margin-top:30mm}
+  #s9protocol{margin-top:10px}
   .partner-logos-section{display:none!important}
   .tbl-scroll{overflow-x:visible!important}
   .cmp-table-wrap{display:none!important}
@@ -205,23 +211,23 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 </div>
 
 <div class="wiz-progress">
-  <div class="wiz-step-dot active" id="d1"><span>1</span><i data-lucide="check" class="lu"></i></div>
+  <div class="wiz-step-dot active" id="d1" onclick="goToStep(1)"><span>1</span><i data-lucide="check" class="lu"></i></div>
   <div class="wiz-connector"><div class="wiz-connector-fill" id="c1"></div></div>
-  <div class="wiz-step-dot" id="d2"><span>2</span><i data-lucide="check" class="lu"></i></div>
+  <div class="wiz-step-dot" id="d2" onclick="goToStep(2)"><span>2</span><i data-lucide="check" class="lu"></i></div>
   <div class="wiz-connector"><div class="wiz-connector-fill" id="c2"></div></div>
-  <div class="wiz-step-dot" id="d3"><span>3</span><i data-lucide="check" class="lu"></i></div>
+  <div class="wiz-step-dot" id="d3" onclick="goToStep(3)"><span>3</span><i data-lucide="check" class="lu"></i></div>
   <div class="wiz-connector"><div class="wiz-connector-fill" id="c3"></div></div>
-  <div class="wiz-step-dot" id="d4"><span>4</span><i data-lucide="check" class="lu"></i></div>
+  <div class="wiz-step-dot" id="d4" onclick="goToStep(4)"><span>4</span><i data-lucide="check" class="lu"></i></div>
   <div class="wiz-connector"><div class="wiz-connector-fill" id="c4"></div></div>
-  <div class="wiz-step-dot" id="d5"><span>5</span><i data-lucide="check" class="lu"></i></div>
+  <div class="wiz-step-dot" id="d5" onclick="goToStep(5)"><span>5</span><i data-lucide="check" class="lu"></i></div>
   <div class="wiz-connector"><div class="wiz-connector-fill" id="c5"></div></div>
-  <div class="wiz-step-dot" id="d6"><span>6</span><i data-lucide="check" class="lu"></i></div>
+  <div class="wiz-step-dot" id="d6" onclick="goToStep(6)"><span>6</span><i data-lucide="check" class="lu"></i></div>
   <div class="wiz-connector"><div class="wiz-connector-fill" id="c6"></div></div>
-  <div class="wiz-step-dot" id="d7"><span>7</span><i data-lucide="check" class="lu"></i></div>
+  <div class="wiz-step-dot" id="d7" onclick="goToStep(7)"><span>7</span><i data-lucide="check" class="lu"></i></div>
   <div class="wiz-connector"><div class="wiz-connector-fill" id="c7"></div></div>
-  <div class="wiz-step-dot" id="d8"><span>8</span><i data-lucide="check" class="lu"></i></div>
+  <div class="wiz-step-dot" id="d8" onclick="goToStep(8)"><span>8</span><i data-lucide="check" class="lu"></i></div>
   <div class="wiz-connector"><div class="wiz-connector-fill" id="c8"></div></div>
-  <div class="wiz-step-dot" id="d9"><span>9</span><i data-lucide="check" class="lu"></i></div>
+  <div class="wiz-step-dot" id="d9" onclick="goToStep(9)"><span>9</span><i data-lucide="check" class="lu"></i></div>
 </div>
 
 <!-- S1 Kundendaten -->
@@ -251,29 +257,15 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 <!-- S2 Mitarbeiter -->
 <div class="wiz-screen" id="s2">
   <p class="wiz-eyebrow">Schritt 2 · Mitarbeiterstruktur</p>
-  <h2 class="wiz-title">Wie groß ist die Belegschaft?</h2>
+  <h2 class="wiz-title">Größe der Belegschaft und Altersstruktur</h2>
   <p class="wiz-sub">Mitarbeiterzahl und Demografik – das bestimmt, welche Anbieter überhaupt infrage kommen und wie wir den Tarif zuschneiden.</p>
   <div class="g2">
     <div class="field"><label class="l">Mitarbeiter gesamt</label><input type="number" id="mag" min="1" placeholder="z. B. 80" oninput="syncMA()"></div>
-    <div class="field"><label class="l">Davon gesetzlich versichert <span class="lh">(GKV, ohne PKV / GF)</span></label><input type="number" id="mav" min="1" placeholder="z. B. 65" oninput="syncMA()"></div>
+    <div class="field"><label class="l">Davon gesetzlich versichert <span class="lh">(GKV, ohne PKV / GF)</span></label><input type="number" id="mav" min="1" placeholder="z. B. 65"></div>
   </div>
   <div class="ib b" id="gkvinfo"><i data-lucide="info" class="lu"></i><span>Nur gesetzlich versicherte Mitarbeitende sind über eine bKV versicherbar. Privat Versicherte und Geschäftsführung werden separat betrachtet.</span></div>
   <hr class="hr">
-  <div class="g2">
-    <div class="field"><label class="l">Durchschnittsalter Ihrer Belegschaft</label><select id="alts"><option value="gemischt">Gemischt (Ø 33–48)</option><option value="jung">Überwiegend jung (Ø &lt; 33)</option><option value="erfahren">Überwiegend erfahren (Ø &gt; 48)</option></select></div>
-    <div class="field"><label class="l">Berufsgruppe / Tätigkeitsschwerpunkt</label><select id="beruf">
-      <option value="">– wählen –</option>
-      <option value="buero">Büro & Verwaltung</option>
-      <option value="produktion">Produktion & Fertigung</option>
-      <option value="handwerk">Handwerk & Bau</option>
-      <option value="aussendienst">Außendienst & Vertrieb</option>
-      <option value="pflege">Pflege & Gesundheitswesen</option>
-      <option value="logistik">Logistik & Transport</option>
-      <option value="it">IT & Technologie</option>
-      <option value="gastro">Gastronomie & Einzelhandel</option>
-      <option value="gemischt">Gemischte Tätigkeitsfelder</option>
-    </select></div>
-  </div>
+  <div class="field"><label class="l">Durchschnittsalter Ihrer Belegschaft</label><select id="alts"><option value="gemischt">Gemischt (Ø 33–48)</option><option value="jung">Überwiegend jung (Ø &lt; 33)</option><option value="erfahren">Überwiegend erfahren (Ø &gt; 48)</option></select></div>
   <div class="wiz-nav"><button class="wiz-btn wiz-btn-ghost" onclick="prev()"><i data-lucide="arrow-left" class="lu"></i> Zurück</button><button class="wiz-btn wiz-btn-primary" onclick="next()">Weiter <i data-lucide="arrow-right" class="lu"></i></button></div>
 </div>
 
@@ -347,11 +339,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   <p class="wiz-eyebrow">Schritt 5 · Leistungspriorisierung</p>
   <h2 class="wiz-title">Was ist der Belegschaft wichtig?</h2>
   <p class="wiz-sub">Die Priorisierung fließt direkt in die Anbieterempfehlung ein. <strong>Muss-Leistungen</strong> werden besonders stark gewichtet.</p>
-  <div id="priogrid"></div>
-  <hr class="hr">
-  <p class="sl">Beitragsstabilität</p>
-  <div class="pcard"><div class="ptop"><div class="pico"><i data-lucide="anchor" class="lu"></i></div><div><div class="pname">Wie wichtig ist Ihnen langfristige Beitragsstabilität?</div><div class="pdsc">Fließt nur ein, wenn Sie sie gewichten – bewertet wird ausschließlich die dokumentierte Beitragshistorie der Anbieter.</div></div></div>
-  <div class="pbrow" id="stabrow"></div></div>
+  <div id="priogrid" class="prio-grid"></div>
   <div class="wiz-nav"><button class="wiz-btn wiz-btn-ghost" onclick="prev()"><i data-lucide="arrow-left" class="lu"></i> Zurück</button><button class="wiz-btn wiz-btn-primary" onclick="next()">Weiter <i data-lucide="arrow-right" class="lu"></i></button></div>
 </div>
 
@@ -567,7 +555,7 @@ const MBSVC=[
  {id:'checkin',icon:'calendar-check-2',n:'Regelmäßige Strategie-Check-ins',d:'Feste Termine, bei denen wir gemeinsam Nutzung, Zufriedenheit und mögliche Anpassungen besprechen.',ind:'Empfehlenswert für Unternehmen, die die bKV aktiv als strategisches Instrument der Mitarbeiterbindung nutzen wollen.'}
 ];
 let cur=1;
-const S={fn:'',br:'',asp:'',pos:'',ent:'GF+HR',gdat:'',maG:0,maV:0,alts:'gemischt',beruf:'',sb:0,modell:'budget',budget:600,beitragMonatlich:50,start:'',vrunde:'neu',prio:{z:2,b:2,v:2,h:1,k:1,au:1,p:1},prioStab:2,vq:{beitrag:'nein',pflege:'nein',aufstock:'nein',familie:'nein',mitnahme:'nein'},vorh:'nein',exAnb:'',exTar:'',exBei:'',noti:'',mbsvc:[],contacts:[{name:'',position:'',tel:'',email:''}]};
+const S={fn:'',br:'',asp:'',pos:'',ent:'GF+HR',gdat:'',maG:0,maV:0,alts:'gemischt',sb:0,modell:'budget',budget:600,beitragMonatlich:50,start:'',vrunde:'neu',prio:{z:2,b:2,v:2,h:1,k:1,au:1,p:1},prioStab:2,vq:{beitrag:'nein',pflege:'nein',aufstock:'nein',familie:'nein',mitnahme:'nein'},vorh:'nein',exAnb:'',exTar:'',exBei:'',noti:'',mbsvc:[],contacts:[{name:'',position:'',tel:'',email:''}]};
 function lucideRefresh(){ if(window.lucide) lucide.createIcons(); }
 function showStep(n){
   for(let i=1;i<=TOTAL_STEPS;i++){
@@ -588,13 +576,14 @@ function showStep(n){
 function save(){
   const g=id=>{const e=document.getElementById(id);return e?e.value:''};
   if(cur===1){S.fn=g('fn');S.br=g('br');S.asp=g('asp');S.pos=g('pos');S.gdat=g('gdat')}
-  if(cur===2){S.maG=+g('mag')||0;S.maV=+g('mav')||0;S.alts=g('alts');S.beruf=g('beruf')}
+  if(cur===2){S.maG=+g('mag')||0;S.maV=+g('mav')||0;S.alts=g('alts')}
   if(cur===3){S.sb=(+g('sb1')||0)+(+g('sb2')||0)+(+g('sb3')||0)+(+g('sb4')||0)}
   if(cur===4){S.beitragMonatlich=+g('budinput')||S.beitragMonatlich;S.start=g('start');S.vrunde=g('vrunde')}
   if(cur===7){S.exAnb=g('exanb');S.exTar=g('extar');S.exBei=g('exbei');S.noti=g('noti')}
 }
 function next(){save();showStep(Math.min(cur+1,TOTAL_STEPS))}
 function prev(){save();showStep(Math.max(cur-1,1))}
+function goToStep(n){if(n>=cur)return;save();showStep(n)}
 function syncMA(){
   const mag=+document.getElementById('mag').value||0;
   const mav=document.getElementById('mav');
@@ -712,11 +701,12 @@ function starWidget(current,onClickExpr){
   return `<div class="star-row">${xBtn}${stars}</div>`;
 }
 function renderPrio(){
-  document.getElementById('priogrid').innerHTML=LEIST.map(l=>`
+  const leistCards=LEIST.map(l=>`
   <div class="pcard"><div class="ptop"><div class="pico"><i data-lucide="${l.icon}" class="lu"></i></div><div><div class="pname">${l.n}</div><div class="pdsc">${l.d}</div></div></div>
   ${starWidget(S.prio[l.id],`setPrio('${l.id}',VAL)`)}</div>`).join('');
-  const sr=document.getElementById('stabrow');
-  if(sr)sr.innerHTML=starWidget(S.prioStab,'setPrioStab(VAL)');
+  const stabCard=`<div class="pcard"><div class="ptop"><div class="pico"><i data-lucide="anchor" class="lu"></i></div><div><div class="pname">Beitragsstabilität</div><div class="pdsc">Fließt nur ein, wenn Sie sie gewichten – bewertet wird die dokumentierte Beitragshistorie.</div></div></div>
+  ${starWidget(S.prioStab,'setPrioStab(VAL)')}</div>`;
+  document.getElementById('priogrid').innerHTML=leistCards+stabCard;
   lucideRefresh();
 }
 function setPrio(id,v){S.prio[id]=v;renderPrio()}
@@ -979,7 +969,6 @@ function renderProtocolSummary(){
     ['Mitarbeiter gesamt',S.maG],
     ['Davon versicherbar (GKV)',S.maV],
     ['Durchschnittsalter',esc(ALTS_LBL[S.alts]||S.alts)],
-    ['Berufsgruppe',esc(S.beruf)],
   ]);
   h+=protoSection('Sachbezüge','wallet',[
     ['Bereits genutzte Sachbezüge',S.sb?eu(S.sb)+' € / Monat':''],
@@ -1038,7 +1027,7 @@ function sendToSheet(elig){
     // Schritt 1 – Kundendaten
     firmenname:S.fn,branche:S.br,ansprechpartnerS1:S.asp,positionS1:S.pos,entscheidungstraeger:ENT_LBL[S.ent]||S.ent,gespraechsdatum:S.gdat,
     // Schritt 2 – Mitarbeiterstruktur
-    mitarbeiterGesamt:S.maG,mitarbeiterVersicherbar:S.maV,durchschnittsalter:ALTS_LBL[S.alts]||S.alts,berufsgruppe:S.beruf,
+    mitarbeiterGesamt:S.maG,mitarbeiterVersicherbar:S.maV,durchschnittsalter:ALTS_LBL[S.alts]||S.alts,
     // Schritt 3 – Sachbezüge
     sachbezuegeGenutzt:S.sb,
     // Schritt 4 – Budget & Modell
