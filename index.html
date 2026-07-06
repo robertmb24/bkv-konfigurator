@@ -199,6 +199,8 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   table thead{display:table-header-group}
   tr{page-break-inside:avoid;break-inside:avoid}
   .wiz-rec,.ib{page-break-inside:avoid;break-inside:avoid}
+  .proto-row{page-break-inside:avoid;break-inside:avoid}
+  .proto-section-title{page-break-after:avoid;break-after:avoid}
 }
 </style>
 </head>
@@ -260,7 +262,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   <h2 class="wiz-title">Größe der Belegschaft und Altersstruktur</h2>
   <p class="wiz-sub">Mitarbeiterzahl und Demografik – das bestimmt, welche Anbieter überhaupt infrage kommen und wie wir den Tarif zuschneiden.</p>
   <div class="g2">
-    <div class="field"><label class="l">Mitarbeiter gesamt</label><input type="number" id="mag" min="1" placeholder="z. B. 80" oninput="syncMA()"></div>
+    <div class="field"><label class="l">Mitarbeiter gesamt</label><input type="number" id="mag" min="1" placeholder="z. B. 80" onblur="syncMA()"></div>
     <div class="field"><label class="l">Davon gesetzlich versichert <span class="lh">(GKV, ohne PKV / GF)</span></label><input type="number" id="mav" min="1" placeholder="z. B. 65"></div>
   </div>
   <div class="ib b" id="gkvinfo"><i data-lucide="info" class="lu"></i><span>Nur gesetzlich versicherte Mitarbeitende sind über eine bKV versicherbar. Privat Versicherte und Geschäftsführung werden separat betrachtet.</span></div>
