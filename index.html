@@ -190,7 +190,8 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   .pdf-header img{height:22px;width:auto}
   .pdf-header span{font-size:12.5px;font-weight:500;color:var(--ink-mid)}
   #s7c{margin-top:26mm}
-  #s9thanks{margin-top:30mm}
+  #s9thanks{margin-top:18mm}
+  #s9thanks .wiz-rec{padding:20px 22px;margin-bottom:10px}
   #s9protocol{margin-top:10px}
   .partner-logos-section{display:none!important}
   .tbl-scroll{overflow-x:visible!important}
@@ -199,8 +200,11 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   table thead{display:table-header-group}
   tr{page-break-inside:avoid;break-inside:avoid}
   .wiz-rec,.ib{page-break-inside:avoid;break-inside:avoid}
-  .proto-row{page-break-inside:avoid;break-inside:avoid}
+  .proto-row{page-break-inside:avoid;break-inside:avoid;padding:4px 0}
   .proto-section-title{page-break-after:avoid;break-after:avoid}
+  .proto-section{padding:11px 16px;margin-bottom:9px}
+  #page3start{page-break-before:always;break-before:page;margin-top:22mm}
+  #page4start{page-break-before:always;break-before:page;margin-top:22mm;page-break-inside:avoid;break-inside:avoid}
 }
 </style>
 </head>
@@ -941,10 +945,10 @@ const ENT_LBL={HR:'HR-Leitung',['GF+HR']:'HR + GF gemeinsam',GF:'Geschäftsführ
 // da die Auswertung selbst dem Kunden nicht mehr angezeigt wird (nur intern/Sheets-Export).
 // Baut eine saubere Zeile-für-Zeile-Sektion (Label: Wert) statt einer Pill-Wolke -
 // besser lesbar auf Bildschirm und im PDF-Ausdruck.
-function protoSection(title,icon,rows){
+function protoSection(title,icon,rows,id){
   const visibleRows=rows.filter(r=>r&&r[1]!=null&&r[1]!=='');
   if(!visibleRows.length)return'';
-  return `<div class="proto-section">
+  return `<div class="proto-section"${id?` id="${id}"`:''}>
     <div class="proto-section-title"><i data-lucide="${icon}" class="lu"></i>${esc(title)}</div>
     ${visibleRows.map(([label,value])=>`<div class="proto-row"><span class="proto-label">${esc(label)}</span><span class="proto-value">${value}</span></div>`).join('')}
   </div>`;
@@ -982,22 +986,22 @@ function renderProtocolSummary(){
     ['Vertragsrunde',esc(VRUNDE_LBL[S.vrunde]||S.vrunde)],
   ]);
   h+=protoSection('Leistungspriorisierung','list-checks',
-    prioList.map(l=>[l.n,PLBLS[S.prio[l.id]||0]]).concat([['Beitragsstabilität',PLBLS[S.prioStab||0]]])
+    prioList.map(l=>[l.n,PLBLS[S.prio[l.id]||0]]).concat([['Beitragsstabilität',PLBLS[S.prioStab||0]]]),
+    'page3start'
   );
   h+=protoSection('Vertragsdetails','file-text',
     Object.keys(VQL_FULL).map(k=>[VQL_FULL[k],S.vq[k]==='ja'?'Wichtig':'Eher nicht wichtig'])
   );
-  h+=protoSection('Wettbewerb','scale',[
+  h+=protoSection('Bestehende Angebote','scale',[
     ['Bestehendes Angebot',S.vorh==='ja'?'Ja':'Nein'],
     ['Bestehender Anbieter',esc(S.exAnb)],
     ['Bestehender Tarif',esc(S.exTar)],
     ['Bestehender Monatsbeitrag',S.exBei?eu(S.exBei)+' €':''],
   ]);
-  if(S.mbsvc.length){
-    h+=protoSection('Gewünschte MB24-Leistungen','shield-check',
-      S.mbsvc.map(id=>{const sv=MBSVC.find(x=>x.id===id);return sv?[sv.n,'Gewünscht']:null}).filter(Boolean)
-    );
-  }
+  h+=`<div class="proto-section" id="page4start">
+    <div class="proto-section-title"><i data-lucide="shield-check" class="lu"></i>MB24-Begleitleistungen</div>
+    ${MBSVC.map(sv=>`<div class="proto-row"><span class="proto-label">${esc(sv.n)}</span><span class="proto-value">${S.mbsvc.includes(sv.id)?'Ja':'Nein'}</span></div>`).join('')}
+  </div>`;
   if(contacts.length){
     h+=protoSection('Ansprechpartner','contact',
       contacts.map((c,i)=>[
