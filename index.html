@@ -182,15 +182,15 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   html,body{height:auto!important;overflow:visible!important}
   .bkv-wizard{height:auto!important;overflow:visible!important;padding:0 40px!important}
   *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
-  @page{size:A4;margin:26mm 0 16mm}
-  .pdf-title{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;position:relative;z-index:2;background:#fff;min-height:230mm;margin:-26mm -40px 0;padding:26mm 40px 0;page-break-after:always;break-after:page}
+  @page{size:A4;margin:34mm 0 16mm}
+  .pdf-title{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;position:relative;z-index:2;background:#fff;min-height:230mm;margin:-34mm -40px 0;padding:34mm 40px 0;page-break-after:always;break-after:page}
   .pdf-title img{max-width:260px;height:auto}
   .pdf-title .pdf-title-name{font-size:20px;font-weight:600;color:var(--ink)}
   .pdf-header{display:flex;align-items:center;gap:10px;position:fixed;top:0;left:0;right:0;padding:0 40px 14px;border-bottom:1px solid var(--border);background:#fff;z-index:1}
   .pdf-header img{height:22px;width:auto}
   .pdf-header span{font-size:12.5px;font-weight:500;color:var(--ink-mid)}
-  #s7c{margin-top:26mm}
-  #s9thanks{margin-top:30mm}
+  #s9thanks{margin-top:0}
+  #s9thanks .wiz-rec{padding:20px 22px;margin-bottom:10px}
   #s9protocol{margin-top:10px}
   .partner-logos-section{display:none!important}
   .tbl-scroll{overflow-x:visible!important}
@@ -199,8 +199,9 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
   table thead{display:table-header-group}
   tr{page-break-inside:avoid;break-inside:avoid}
   .wiz-rec,.ib{page-break-inside:avoid;break-inside:avoid}
-  .proto-row{page-break-inside:avoid;break-inside:avoid}
-  .proto-section-title{page-break-after:avoid;break-after:avoid}
+  .proto-row{page-break-inside:avoid;break-inside:avoid;padding:4px 0}
+  .proto-section{padding:11px 16px;margin-bottom:9px}
+  .proto-section-title{page-break-inside:avoid;break-inside:avoid}
 }
 </style>
 </head>
@@ -993,11 +994,9 @@ function renderProtocolSummary(){
     ['Bestehender Tarif',esc(S.exTar)],
     ['Bestehender Monatsbeitrag',S.exBei?eu(S.exBei)+' €':''],
   ]);
-  if(S.mbsvc.length){
-    h+=protoSection('Gewünschte MB24-Leistungen','shield-check',
-      S.mbsvc.map(id=>{const sv=MBSVC.find(x=>x.id===id);return sv?[sv.n,'Gewünscht']:null}).filter(Boolean)
-    );
-  }
+  h+=protoSection('Gewünschte MB24-Leistungen','shield-check',
+    MBSVC.map(sv=>[sv.n,S.mbsvc.includes(sv.id)?'Ja':'Nein'])
+  );
   if(contacts.length){
     h+=protoSection('Ansprechpartner','contact',
       contacts.map((c,i)=>[
